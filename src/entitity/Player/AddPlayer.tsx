@@ -10,12 +10,13 @@ type AddPlayerProps = {
 
 export const AddPlayer: FC<AddPlayerProps> = ({ className }) => {
   const addPlayer = usePlayerStore((state) => state.addPlayer);
+  const players = usePlayerStore((state) => state.players);
 
   const handleAddPlayer = () => {
     const newPlayer: Player = {
       id: crypto.randomUUID(),
-      nickname: "Nickname",
-      mmr: 3000,
+      nickname: `Nickname ${players.length + 1}`,
+      mmr: Math.floor(Math.random() * (14000 - 1000 + 1)) + 1000,
       role: "1-2-3-4-5",
       chillZoneValue: 0,
       lives: 3,

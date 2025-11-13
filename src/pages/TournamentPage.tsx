@@ -1,19 +1,19 @@
 import React from "react";
-// import { useTournamentStore } from "../store/tournamentStore";
 import { useNavigate } from "react-router-dom";
 import { Button, Center } from "@mantine/core";
 import { TournamentTable } from "../features/TournamentTable";
-import { usePlayerStore } from "../entitity/Player";
 import { useLobbyStore } from "../features/Lobby";
+import { usePlayerStore } from "../entitity/Player";
 
-const TournamentPage: React.FC = () => {
-  const players = usePlayerStore((state) => state.players);
-  const generateLobbies = useLobbyStore((state) => state.generateLobbies);
+export const TournamentPage: React.FC = () => {
   const navigate = useNavigate();
+  const generateLobbies = useLobbyStore((state) => state.generateLobbies);
+  const generateTeams = useLobbyStore((state) => state.generateTeams);
+  const players = usePlayerStore((state) => state.players);
 
   const handleGenerateLobbies = () => {
-    const alivePlayers = players.filter((p) => (p.lives ?? 2) > 0);
-    generateLobbies(alivePlayers);
+    generateLobbies(players);
+    generateTeams();
     navigate("/lobbies");
   };
 
@@ -28,5 +28,3 @@ const TournamentPage: React.FC = () => {
     </div>
   );
 };
-
-export default TournamentPage;

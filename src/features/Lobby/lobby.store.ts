@@ -1,10 +1,10 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { devtools, persist } from "zustand/middleware";
 import type { Player } from "../../entitity/Player";
 
 export interface LobbyTeams {
-  team1: Player[];
-  team2: Player[];
+  team1: Array<Player | null>;
+  team2: Array<Player | null>;
   winner: "team1" | "team2" | null;
 }
 type Teams = Record<string, LobbyTeams>;
@@ -18,146 +18,153 @@ interface LobbyStoreState {
   setTeam: (
     lobbyKey: string,
     which: "team1" | "team2",
-    player: Player,
+    player: Player | null,
     index: number,
   ) => void; // changed: single player
   setWinner: (lobbyKey: string, winner: "team1" | "team2") => void;
 }
 
 export const useLobbyStore = create<LobbyStoreState>()(
-  persist(
-    (set, get) => ({
-      lobbies: [],
-      chillZone: [],
-      teams: null,
-      setWinner: (lobbyKey, winner) =>
-        set((state) => {
-          if (!state.teams || !state.teams[lobbyKey]) return state;
-          return {
-            teams: {
-              ...state.teams,
-              [lobbyKey]: {
-                ...state.teams[lobbyKey],
-                winner,
+  devtools(
+    persist(
+      (set, get) => ({
+        lobbies: [],
+        chillZone: [],
+        teams: null,
+        setWinner: (lobbyKey, winner) =>
+          set((state) => {
+            if (!state.teams || !state.teams[lobbyKey]) return state;
+            return {
+              teams: {
+                ...state.teams,
+                [lobbyKey]: {
+                  ...state.teams[lobbyKey],
+                  winner,
+                },
               },
-            },
-          };
-        }),
-      setTeam: (lobbyKey, which, player, index) =>
-        set((state) => {
-          if (!state.teams || !state.teams[lobbyKey]) return state;
-          const teamData = state.teams[lobbyKey];
-          const currentTeam = [...teamData[which]];
+            };
+          }),
+        setTeam: (lobbyKey, which, player, index) =>
+          set((state) => {
+            if (!state.teams || !state.teams[lobbyKey]) return state;
+            const teamData = state.teams[lobbyKey];
+            const currentTeam = [...teamData[which]];
 
-          // Проверяем дубликат в другой позиции
-          if (currentTeam.some((p) => p.id === player.id)) {
-            // Если игрок уже на этой позиции, просто возвращаем state
-            if (currentTeam[index]?.id === player.id) return state;
-          }
+            if (player) {
+              // Проверяем дубликат только если player не null
+              if (currentTeam.some((p) => p?.id === player.id)) {
+                if (currentTeam[index]?.id === player.id) return state;
+              }
+            }
 
-          currentTeam[index] = player; // Обновляем конкретный слот
+            // Если player === null просто очищаем слот
+            currentTeam[index] = player === null ? null : player;
 
-          return {
-            teams: {
-              ...state.teams,
-              [lobbyKey]: {
-                ...teamData,
-                [which]: currentTeam,
+            return {
+              teams: {
+                ...state.teams,
+                [lobbyKey]: {
+                  ...teamData,
+                  [which]: currentTeam,
+                },
               },
-            },
-          };
-        }),
-      generateTeams: () => {
-        const lobbies = get().lobbies;
-        const newTeams: Teams = {};
-        lobbies.forEach((lobby, idx) => {
-          const lobbyKey = `lobby-${idx}`;
-          if (lobby.length === 0) return; // skip empty lobby
+            };
+          }),
+        generateTeams: () => {
+          const lobbies = get().lobbies;
+          const newTeams: Teams = {};
+          lobbies.forEach((lobby, idx) => {
+            const lobbyKey = `lobby-${idx}`;
+            if (lobby.length === 0) return; // skip empty lobby
 
-          const sortedByMMR = [...lobby].sort(
-            (a, b) => Number(b.mmr) - Number(a.mmr),
-          );
-          const topMMR = sortedByMMR[0].mmr;
-          const topCandidates = sortedByMMR.filter((p) => p.mmr === topMMR);
-          const captain1 =
-            topCandidates[Math.floor(Math.random() * topCandidates.length)];
+            const sortedByMMR = [...lobby].sort(
+              (a, b) => Number(b.mmr) - Number(a.mmr),
+            );
+            const topMMR = sortedByMMR[0].mmr;
+            const topCandidates = sortedByMMR.filter((p) => p.mmr === topMMR);
+            const captain1 =
+              topCandidates[Math.floor(Math.random() * topCandidates.length)];
 
-          let captain2: Player;
-          if (sortedByMMR.length > 1) {
-            const remainingCandidates = sortedByMMR.filter(
-              (p) => p.id !== captain1.id,
+            let captain2: Player;
+            if (sortedByMMR.length > 1) {
+              const remainingCandidates = sortedByMMR.filter(
+                (p) => p.id !== captain1.id,
+              );
+              const secondTopMMR = remainingCandidates[0].mmr;
+              const secondCandidates = remainingCandidates.filter(
+                (p) => p.mmr === secondTopMMR,
+              );
+              captain2 =
+                secondCandidates[
+                  Math.floor(Math.random() * secondCandidates.length)
+                ];
+            } else {
+              captain2 = captain1;
+            }
+
+            newTeams[lobbyKey] = {
+              team1: [captain1],
+              team2: [captain2],
+              winner: null,
+            };
+          });
+          set({ teams: newTeams });
+        },
+        generateLobbies: (allPlayers: Player[]) => {
+          // ✅ Берём только живых игроков для генерации лобби
+          const alivePlayers = allPlayers.filter((p) => p.lives > 0);
+
+          const shuffle = <T>(arr: T[]): T[] =>
+            [...arr].sort(() => Math.random() - 0.5);
+          const shuffled = shuffle(alivePlayers);
+
+          const totalPlayers = shuffled.length;
+          const chillCount = totalPlayers % 10;
+
+          let chillZonePlayers: Player[] = [];
+          let lobbyPlayers: Player[] = shuffled;
+
+          if (chillCount > 0) {
+            // Выбираем тех, у кого меньше всего chillZone
+            const minChill = Math.min(...shuffled.map((p) => p.chillZoneValue));
+            const candidates = shuffled.filter(
+              (p) => p.chillZoneValue === minChill,
             );
-            const secondTopMMR = remainingCandidates[0].mmr;
-            const secondCandidates = remainingCandidates.filter(
-              (p) => p.mmr === secondTopMMR,
-            );
-            captain2 =
-              secondCandidates[
-                Math.floor(Math.random() * secondCandidates.length)
+
+            if (candidates.length > chillCount) {
+              chillZonePlayers = shuffle(candidates).slice(0, chillCount);
+            } else {
+              const remainingNeeded = chillCount - candidates.length;
+              const others = shuffled
+                .filter((p) => !candidates.includes(p))
+                .sort((a, b) => a.chillZoneValue - b.chillZoneValue);
+              chillZonePlayers = [
+                ...candidates,
+                ...others.slice(0, remainingNeeded),
               ];
-          } else {
-            captain2 = captain1;
+            }
+
+            lobbyPlayers = shuffled.filter(
+              (p) => !chillZonePlayers.includes(p),
+            );
+          }
+          // Разбиваем оставшихся по лобби по 10 человек
+          const lobbies: Player[][] = [];
+          for (let i = 0; i < lobbyPlayers.length; i += 10) {
+            lobbies.push(lobbyPlayers.slice(i, i + 10));
           }
 
-          newTeams[lobbyKey] = {
-            team1: [captain1],
-            team2: [captain2],
-            winner: null,
-          };
-        });
-        set({ teams: newTeams });
-      },
-      generateLobbies: (allPlayers: Player[]) => {
-        // ✅ Берём только живых игроков для генерации лобби
-        const alivePlayers = allPlayers.filter((p) => p.lives > 0);
-
-        const shuffle = <T>(arr: T[]): T[] =>
-          [...arr].sort(() => Math.random() - 0.5);
-        const shuffled = shuffle(alivePlayers);
-
-        const totalPlayers = shuffled.length;
-        const chillCount = totalPlayers % 10;
-
-        let chillZonePlayers: Player[] = [];
-        let lobbyPlayers: Player[] = shuffled;
-
-        if (chillCount > 0) {
-          // Выбираем тех, у кого меньше всего chillZone
-          const minChill = Math.min(...shuffled.map((p) => p.chillZoneValue));
-          const candidates = shuffled.filter(
-            (p) => p.chillZoneValue === minChill,
-          );
-
-          if (candidates.length > chillCount) {
-            chillZonePlayers = shuffle(candidates).slice(0, chillCount);
-          } else {
-            const remainingNeeded = chillCount - candidates.length;
-            const others = shuffled
-              .filter((p) => !candidates.includes(p))
-              .sort((a, b) => a.chillZoneValue - b.chillZoneValue);
-            chillZonePlayers = [
-              ...candidates,
-              ...others.slice(0, remainingNeeded),
-            ];
-          }
-
-          lobbyPlayers = shuffled.filter((p) => !chillZonePlayers.includes(p));
-        }
-
-        // Разбиваем оставшихся по лобби по 10 человек
-        const lobbies: Player[][] = [];
-        for (let i = 0; i < lobbyPlayers.length; i += 10) {
-          lobbies.push(lobbyPlayers.slice(i, i + 10));
-        }
-
-        set({ lobbies: lobbies, chillZone: chillZonePlayers });
-      },
-    }),
-    {
-      name: "lobbies-storage",
-      partialize: (state) => ({
-        lobbies: state.lobbies,
+          set({ lobbies: lobbies, chillZone: chillZonePlayers });
+        },
       }),
-    },
+      {
+        name: "lobbies-storage",
+        partialize: (state) => ({
+          lobbies: state.lobbies,
+          chillZone: state.chillZone,
+          teams: state.teams,
+        }),
+      },
+    ),
   ),
 );

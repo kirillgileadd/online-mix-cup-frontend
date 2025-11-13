@@ -1,5 +1,5 @@
 import { type FC, useMemo } from "react";
-import { Select, Stack, Table } from "@mantine/core";
+import { Select, Stack } from "@mantine/core";
 import { type LobbyTeams, useLobbyStore } from "./lobby.store";
 import type { Player } from "../../entitity/Player";
 
@@ -15,8 +15,8 @@ export const Team: FC<TeamProps> = ({ lobbyKey, team, players }) => {
   // Игроки, которых можно выбрать (не в других слотах)
   const validPlayerForSelect = useMemo(() => {
     return players.filter((p) => {
-      const inTeam1 = team?.team1.find((tp) => tp.id === p.id);
-      const inTeam2 = team?.team2.find((tp) => tp.id === p.id);
+      const inTeam1 = team?.team1.find((tp) => tp?.id === p.id);
+      const inTeam2 = team?.team2.find((tp) => tp?.id === p.id);
       return !inTeam1 && !inTeam2;
     });
   }, [team, players]);
@@ -45,47 +45,41 @@ export const Team: FC<TeamProps> = ({ lobbyKey, team, players }) => {
     playerId: string | null,
     index: number,
   ) => {
-    if (!playerId) return;
-    const player = players.find((p) => p.id === playerId);
-    if (!player) return;
+    const player = players.find((p) => p.id === playerId) ?? null;
 
     setTeam(lobbyKey, teamKey, player, index);
   };
 
   return (
     <Stack mt="sm">
-      <Table striped highlightOnHover verticalSpacing="md">
-        <thead className="text-center">
-          <tr>
-            <th>Команда 1</th>
-            <th>Команда 2</th>
-          </tr>
-        </thead>
-        <tbody className="text-center">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <tr key={`${lobbyKey}-team-${i}`}>
-              <td>
-                <Select
-                  data={getOptions(team?.team1[i]?.id)}
-                  value={team?.team1[i]?.id ?? ""}
-                  onChange={(val) => handleSelectChange("team1", val, i)}
-                  // disabled={i === 0}
-                  style={{ width: "100%" }}
-                />
-              </td>
-              <td>
-                <Select
-                  data={getOptions(team?.team2[i]?.id)}
-                  value={team?.team2[i]?.id ?? ""}
-                  onChange={(val) => handleSelectChange("team2", val, i)}
-                  // disabled={i === 0}
-                  style={{ width: "100%" }}
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <div>
+        <div className="flex gap-2 w-full mb-2">
+          <p className="basis-1/2">Команда 1</p>
+          <p className="basis-1/2">Команда 2</p>
+        </div>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div className="flex gap-2" key={`${lobbyKey}`}>
+            <div className="basis-1/2 mb-2">
+              <Select
+                data={getOptions(team?.team1[i]?.id)}
+                value={team?.team1[i]?.id ?? null}
+                onChange={(val) => handleSelectChange("team1", val, i)}
+                // disabled={i === 0}
+                style={{ width: "100%" }}
+              />
+            </div>
+            <div className="basis-1/2">
+              <Select
+                data={getOptions(team?.team2[i]?.id)}
+                value={team?.team2[i]?.id ?? null}
+                onChange={(val) => handleSelectChange("team2", val, i)}
+                // disabled={i === 0}
+                style={{ width: "100%" }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
     </Stack>
   );
 };

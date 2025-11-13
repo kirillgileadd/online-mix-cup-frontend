@@ -112,6 +112,7 @@ export const TournamentTable: FC<TournamentTableProps> = ({ className }) => {
     enableGlobalFilter: true,
     enableTopToolbar: true,
     enableRowActions: false,
+    initialState: { pagination: { pageSize: 50, pageIndex: 0 } },
     defaultColumn: {
       minSize: 100,
       size: 250,

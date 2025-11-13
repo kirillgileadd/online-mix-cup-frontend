@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import TournamentPage from "./pages/TournamentPage.tsx";
 import { Lobby } from "./features/Lobby";
+import { TournamentPage } from "./pages/TournamentPage.tsx";
 
 function App() {
   return (

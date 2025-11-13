@@ -1,106 +1,110 @@
-import { type FC, useLayoutEffect } from "react";
+import { type FC } from "react";
 import { useLobbyStore } from "./lobby.store.ts";
 import { useNavigate } from "react-router-dom";
-import {
-  Button,
-  Card,
-  Center,
-  Group,
-  Select,
-  Stack,
-  Table,
-  Title,
-} from "@mantine/core";
-import { type Player, usePlayerStore } from "../../entitity/Player";
+import { Button, Card, Group, Select, Stack, Title } from "@mantine/core";
 import { Team } from "./Team.tsx";
 import clsx from "clsx";
+import { PlayerTable } from "./PlayerTable.tsx";
+import { usePlayerStore } from "../../entitity/Player/player.store.ts";
+import type { Player } from "../../entitity/Player/types.ts";
+import { notifications } from "@mantine/notifications";
 
 type LobbyProps = {
   className?: string;
 };
 
 export const Lobby: FC<LobbyProps> = ({ className }) => {
-  const players = usePlayerStore((state) => state.players);
+  const navigate = useNavigate();
   const lobbies = useLobbyStore((state) => state.lobbies);
-  const generateLobbies = useLobbyStore((state) => state.generateLobbies);
-  const generateTeams = useLobbyStore((state) => state.generateTeams);
   const teams = useLobbyStore((state) => state.teams);
   const chillZone = useLobbyStore((state) => state.chillZone);
   const setWinner = useLobbyStore((state) => state.setWinner);
-
-  const navigate = useNavigate();
-
-  useLayoutEffect(() => {
-    // generateLobbies(players);
-    generateTeams();
-  }, []);
+  const loseLives = usePlayerStore((state) => state.loseLives);
+  const incrementChillZone = usePlayerStore(
+    (state) => state.incrementChillZone,
+  );
 
   const handleNextRound = () => {
-    navigate("/");
+    if (!teams) {
+      console.warn("Нет данных о командах");
+      return;
+    }
+    const loserIds: string[] = [];
+    let invalid = false;
 
-    // setPlayers here
+    Object.entries(teams).forEach(([lobbyKey, t]) => {
+      const hasNullPlayer = [...t.team1, ...t.team2].some((p) => p === null);
+      if (hasNullPlayer || t.team1.length < 5 || t.team2.length < 5) {
+        notifications.show({
+          title: "Слоты",
+          message: `Лобби ${lobbyKey}: есть незаполненные слоты команд`,
+          color: "red",
+        });
+        invalid = true;
+        return; // skip further processing this lobby
+      }
+      if (!t.winner) {
+        notifications.show({
+          title: "Винер",
+          message: `Лобби ${lobbyKey}: победитель не выбран`,
+          color: "red",
+        });
+        invalid = true;
+        return;
+      }
+      // winner chosen and all players filled
+      if (t.winner !== "team1") {
+        loserIds.push(...t.team1.filter(Boolean).map((p) => (p as Player).id));
+      }
+      if (t.winner !== "team2") {
+        loserIds.push(...t.team2.filter(Boolean).map((p) => (p as Player).id));
+      }
+    });
+
+    if (invalid) return; // abort round finish
+
+    if (loserIds.length) loseLives(loserIds);
+
+    if (chillZone.length) {
+      incrementChillZone(chillZone.map((p) => p.id));
+    }
+
+    navigate("/");
   };
 
   const handleWinnerChange = (lobbyKey: string, val: "team1" | "team2") => {
     setWinner(lobbyKey, val);
   };
 
-  const renderPlayerTable = (data: Player[], prefix: string) => (
-    <Table striped highlightOnHover verticalSpacing="md">
-      <Table.Thead className="text-center">
-        <Table.Tr>
-          <Table.Th>№</Table.Th>
-          <Table.Th>Никнейм</Table.Th>
-          <Table.Th>MMR</Table.Th>
-          <Table.Th>Роль</Table.Th>
-          <Table.Th>Кол-во жизней</Table.Th>
-          <Table.Th>Chill Zone</Table.Th>
-        </Table.Tr>
-      </Table.Thead>
-      <Table.Tbody className="text-center">
-        {data.map((player, i) => {
-          const safeId = player.id || `${prefix}-${i}`;
-          return (
-            <Table.Tr
-              key={`${prefix}-${safeId}`}
-              style={{
-                opacity: (player.lives ?? 0) <= 0 ? 0.5 : 1,
-                backgroundColor:
-                  (player.lives ?? 0) <= 0 ? "#f8d7da" : "transparent",
-              }}
-            >
-              <Table.Td>{i + 1}</Table.Td>
-              <Table.Td>{player.nickname}</Table.Td>
-              <Table.Td>{player.mmr}</Table.Td>
-              <Table.Td>{player.role}</Table.Td>
-              <Table.Td>{player.lives}</Table.Td>
-              <Table.Td>{player.chillZoneValue}</Table.Td>
-            </Table.Tr>
-          );
-        })}
-      </Table.Tbody>
-    </Table>
-  );
-
   return (
     <div className={clsx("p-6 max-w-6xl mx-auto", className)}>
-      <Title order={2} className="mb-6">
-        Лобби турнира
-      </Title>
+      <div className="flex justify-between items-center mb-6">
+        <Title order={2} className="mb-6">
+          Лобби турнира
+        </Title>
+        <Button color="green" size="md" onClick={handleNextRound}>
+          Завершить раунд
+        </Button>
+      </div>
 
       <Stack>
         {lobbies.map((lobby, idx) => {
           const lobbyKey = `lobby-${idx}`;
           return (
-            <Card key={lobbyKey} shadow="sm" padding="md" radius="md">
-              <Group align="flex-start">
-                <div className="flex-1">
+            <Card
+              key={lobbyKey}
+              shadow="sm"
+              padding="md"
+              radius="md"
+              bg="gray.8"
+            >
+              <div className="flex gap-4">
+                <div className="flex-1 mb-6">
                   <Title order={4}>Лобби {idx + 1}</Title>
-                  {renderPlayerTable(lobby, lobbyKey)}
+                  <PlayerTable data={lobby} lobbyKey={lobbyKey} />
                 </div>
                 <div className="flex-1">
                   <Title order={4}>Формирование команд</Title>
-
                   <Team
                     team={teams?.[lobbyKey]}
                     lobbyKey={lobbyKey}
@@ -113,33 +117,27 @@ export const Lobby: FC<LobbyProps> = ({ className }) => {
                         { value: "team1", label: "Команда 1" },
                         { value: "team2", label: "Команда 2" },
                       ]}
-                      value={teams?.[lobbyKey]?.winner || ""}
+                      value={teams?.[lobbyKey]?.winner || null}
                       onChange={(val) =>
                         handleWinnerChange(lobbyKey, val as "team1" | "team2")
                       }
                     />
                   </Group>
                 </div>
-              </Group>
+              </div>
             </Card>
           );
         })}
 
         {chillZone.length > 0 && (
-          <Card shadow="sm" padding="md" radius="md">
+          <Card shadow="sm" padding="md" radius="md" bg="gray.8">
             <Title order={4} className="mb-2">
               Chill Zone
             </Title>
-            {renderPlayerTable(chillZone, "chill")}
+            <PlayerTable data={chillZone} />
           </Card>
         )}
       </Stack>
-
-      <Center mt="xl">
-        <Button color="green" size="md" onClick={handleNextRound}>
-          Завершить раунд
-        </Button>
-      </Center>
     </div>
   );
 };

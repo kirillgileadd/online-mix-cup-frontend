@@ -4,12 +4,15 @@ import { MantineProvider } from "@mantine/core";
 import App from "./App";
 import "./index.css";
 import "@mantine/core/styles.css";
-import "mantine-react-table/styles.css"; //import MRT styles
+import "@mantine/notifications/styles.css";
+import "mantine-react-table/styles.css";
+import { Notifications } from "@mantine/notifications"; //import MRT styles
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <MantineProvider defaultColorScheme="dark">
       <App />
+      <Notifications />
     </MantineProvider>
   </StrictMode>,
 );
