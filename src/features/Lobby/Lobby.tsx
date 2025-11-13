@@ -26,11 +26,12 @@ export const Lobby: FC<LobbyProps> = ({ className }) => {
   const generateTeams = useLobbyStore((state) => state.generateTeams);
   const teams = useLobbyStore((state) => state.teams);
   const chillZone = useLobbyStore((state) => state.chillZone);
+  const setWinner = useLobbyStore((state) => state.setWinner);
 
   const navigate = useNavigate();
 
   useLayoutEffect(() => {
-    generateLobbies(players);
+    // generateLobbies(players);
     generateTeams();
   }, []);
 
@@ -40,8 +41,8 @@ export const Lobby: FC<LobbyProps> = ({ className }) => {
     // setPlayers here
   };
 
-  const handleWinnerChange = (val: string) => {
-    console.log(val);
+  const handleWinnerChange = (lobbyKey: string, val: "team1" | "team2") => {
+    setWinner(lobbyKey, val);
   };
 
   const renderPlayerTable = (data: Player[], prefix: string) => (
@@ -98,7 +99,8 @@ export const Lobby: FC<LobbyProps> = ({ className }) => {
                   {renderPlayerTable(lobby, lobbyKey)}
                 </div>
                 <div className="flex-1">
-                  <Title order={4}>Формирование команд</Title>\
+                  <Title order={4}>Формирование команд</Title>
+
                   <Team
                     team={teams?.[lobbyKey]}
                     lobbyKey={lobbyKey}
@@ -113,7 +115,7 @@ export const Lobby: FC<LobbyProps> = ({ className }) => {
                       ]}
                       value={teams?.[lobbyKey]?.winner || ""}
                       onChange={(val) =>
-                        handleWinnerChange(val as "team1" | "team2")
+                        handleWinnerChange(lobbyKey, val as "team1" | "team2")
                       }
                     />
                   </Group>

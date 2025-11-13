@@ -1,1 +1,2 @@
-export { Lobby } from "./Lobby.tsx";
+export { Lobby } from "./Lobby";
+export { useLobbyStore } from "./lobby.store";

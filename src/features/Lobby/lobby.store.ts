@@ -15,7 +15,13 @@ interface LobbyStoreState {
   teams: Teams | null;
   generateLobbies: (playersList: Player[]) => void;
   generateTeams: () => void;
-  setTeam: (lobbyKey: string, which: "team1" | "team2", player: Player) => void; // changed: single player
+  setTeam: (
+    lobbyKey: string,
+    which: "team1" | "team2",
+    player: Player,
+    index: number,
+  ) => void; // changed: single player
+  setWinner: (lobbyKey: string, winner: "team1" | "team2") => void;
 }
 
 export const useLobbyStore = create<LobbyStoreState>()(
@@ -24,18 +30,39 @@ export const useLobbyStore = create<LobbyStoreState>()(
       lobbies: [],
       chillZone: [],
       teams: null,
-      setTeam: (lobbyKey, which, player) =>
+      setWinner: (lobbyKey, winner) =>
         set((state) => {
-          if (!state.teams || !state.teams[lobbyKey]) return state; // nothing to update
+          if (!state.teams || !state.teams[lobbyKey]) return state;
+          return {
+            teams: {
+              ...state.teams,
+              [lobbyKey]: {
+                ...state.teams[lobbyKey],
+                winner,
+              },
+            },
+          };
+        }),
+      setTeam: (lobbyKey, which, player, index) =>
+        set((state) => {
+          if (!state.teams || !state.teams[lobbyKey]) return state;
           const teamData = state.teams[lobbyKey];
-          const currentTeam = teamData[which];
-          if (currentTeam.some((p) => p.id === player.id)) return state;
+          const currentTeam = [...teamData[which]];
+
+          // Проверяем дубликат в другой позиции
+          if (currentTeam.some((p) => p.id === player.id)) {
+            // Если игрок уже на этой позиции, просто возвращаем state
+            if (currentTeam[index]?.id === player.id) return state;
+          }
+
+          currentTeam[index] = player; // Обновляем конкретный слот
+
           return {
             teams: {
               ...state.teams,
               [lobbyKey]: {
                 ...teamData,
-                [which]: [...currentTeam, player],
+                [which]: currentTeam,
               },
             },
           };
