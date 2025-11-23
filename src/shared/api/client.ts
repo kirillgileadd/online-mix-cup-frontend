@@ -1,4 +1,5 @@
 import axios from "axios";
+import { notifications } from "@mantine/notifications";
 import { appSessionStore } from "../session.ts";
 
 let refreshPromise: Promise<string | null> | null = null;
@@ -8,7 +9,7 @@ const getRefreshToken = async () => {
     refreshPromise = (async () => {
       try {
         const result = await publicApiClient.post<{ token: string }>(
-          "/refresh",
+          "/refresh"
         );
         appSessionStore.setSessionToken(result.data.token);
         return result.data.token;
@@ -53,7 +54,7 @@ authorizedApiClient.interceptors.response.use(
   (config) => config,
   async (error) => {
     const request = error.config;
-    if (error.response.status === 401) {
+    if (error.response?.status === 401) {
       const token = appSessionStore.getSessionToken();
 
       if (token) {
@@ -63,7 +64,51 @@ authorizedApiClient.interceptors.response.use(
         }
       }
       appSessionStore.removeSession();
+    } else {
+      // Обрабатываем ошибки, кроме 401
+      handleApiError(error);
     }
-    throw new Error();
-  },
+    // Пробрасываем оригинальную ошибку, чтобы сохранить структуру axios ошибки
+    throw error;
+  }
 );
+
+// Обработчик ошибок для publicApiClient
+publicApiClient.interceptors.response.use(
+  (config) => config,
+  async (error) => {
+    handleApiError(error);
+    throw error;
+  }
+);
+
+/**
+ * Обрабатывает ошибки API и показывает уведомления
+ * @param error - Ошибка от axios
+ */
+const handleApiError = (error: unknown) => {
+  const axiosError = error as {
+    response?: {
+      data?: {
+        message?: string;
+        data?: unknown;
+      };
+      status?: number;
+    };
+  };
+
+  const errorData = axiosError.response?.data;
+
+  // Извлекаем message из ошибки
+  const message = errorData?.message;
+
+  // Показываем уведомление только если есть message и это не ошибка валидации
+  // (ошибки валидации имеют data и обрабатываются отдельно в формах)
+  if (message && !errorData?.data) {
+    notifications.show({
+      title: "Ошибка",
+      message: message,
+      color: "red",
+    });
+  }
+};

@@ -33,3 +33,15 @@ export const loginByTelegram = async (user: TelegramUser) => {
 
   return response;
 };
+
+export const devLogin = async () => {
+  const response = await publicApiClient.post<{ accessToken: string }>(
+    "/auth/dev/login",
+  );
+
+  if (response.data.accessToken) {
+    appSessionStore.setSessionToken(response.data.accessToken);
+  }
+
+  return response;
+};

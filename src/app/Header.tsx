@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { appSessionStore } from "../shared/session.ts";
 import { logout } from "../shared/api/auth.ts";
 import { Button } from "@mantine/core";
+import { AppCan } from "../shared/authorization.tsx";
+import { ROUTES } from "../shared/routes.ts";
 
 export function Header() {
   const navigate = useNavigate();
@@ -22,12 +24,17 @@ export function Header() {
     <header className="bg-gray-700 shadow">
       <div className="mx-auto px-4 sm:px-6">
         <div className="flex justify-between h-16">
-          <div className="flex">
+          <div className="flex items-center gap-10">
             <div className="flex-shrink-0 flex items-center">
               <Link to="/" className="text-xl font-bold text-white">
                 Mixify
               </Link>
             </div>
+            <AppCan action={(permissions) => permissions.users.canManage()}>
+              <nav>
+                <Link to={ROUTES.adminUsers}>Пользаки</Link>
+              </nav>
+            </AppCan>
           </div>
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center gap-2">

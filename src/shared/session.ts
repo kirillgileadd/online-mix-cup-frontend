@@ -2,9 +2,10 @@ import { useSyncExternalStore } from "react";
 import { parseJwt } from "./lib/jwt";
 import { BroadcastEvents } from "./lib/broadcastEvents.ts";
 
-type Session = {
+export type Session = {
   userId: number;
   username: string;
+  roles: string[];
   photoUrl?: string;
 };
 
