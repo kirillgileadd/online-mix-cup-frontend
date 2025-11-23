@@ -3,4 +3,6 @@ export const QUERY_KEYS = {
   USER: "user",
   USERS: "users",
   ROLES: "roles",
+  TOURNAMENT: "tournament",
+  TOURNAMENTS: "tournaments",
 } as const;

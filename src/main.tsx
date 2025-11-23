@@ -4,6 +4,7 @@ import { MantineProvider } from "@mantine/core";
 import "./index.css";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
+import "@mantine/dates/styles.css";
 // import "@mantine/modals/styles.css";
 import "mantine-react-table/styles.css";
 import { Notifications } from "@mantine/notifications";

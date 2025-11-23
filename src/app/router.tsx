@@ -14,6 +14,7 @@ import { UserRole } from "../shared/types.ts";
 import { useRole } from "../shared/authorization.tsx";
 import { ROUTES } from "../shared/routes.ts";
 import { UsersPage } from "../pages/UsersPage.tsx";
+import { TournamentsPage } from "../pages/TournamentsPage.tsx";
 
 // eslint-disable-next-line react-refresh/only-export-components
 function ProtectedRoute({
@@ -69,6 +70,14 @@ export const router = createBrowserRouter([
             element: (
               <ProtectedRoute roles={[UserRole.ADMIN]}>
                 <UsersPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: ROUTES.adminTournaments,
+            element: (
+              <ProtectedRoute roles={[UserRole.ADMIN]}>
+                <TournamentsPage />
               </ProtectedRoute>
             ),
           },

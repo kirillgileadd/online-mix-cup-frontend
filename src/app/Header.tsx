@@ -31,8 +31,9 @@ export function Header() {
               </Link>
             </div>
             <AppCan action={(permissions) => permissions.users.canManage()}>
-              <nav>
+              <nav className="flex gap-4">
                 <Link to={ROUTES.adminUsers}>Пользаки</Link>
+                <Link to={ROUTES.adminTournaments}>Турниры</Link>
               </nav>
             </AppCan>
           </div>
