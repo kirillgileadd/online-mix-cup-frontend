@@ -107,7 +107,7 @@ export const router = createBrowserRouter([
       {
         loader: () => {
           if (appSessionStore.getSessionToken()) {
-            return redirect("/tournament");
+            return redirect(ROUTES.publicTournaments);
           }
           return null;
         },
