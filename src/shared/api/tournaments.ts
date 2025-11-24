@@ -1,4 +1,4 @@
-import { authorizedApiClient } from "./client";
+import { authorizedApiClient, publicApiClient } from "./client";
 import type { Tournament, TournamentStatus } from "../../entitity/Tournament";
 
 export type GetTournamentsResponse = Tournament[];
@@ -33,10 +33,26 @@ export const getTournaments = async (): Promise<GetTournamentsResponse> => {
   return response.data;
 };
 
+export const getPublicTournaments =
+  async (): Promise<GetTournamentsResponse> => {
+    const response =
+      await publicApiClient.get<GetTournamentsResponse>("/tournaments");
+    return response.data;
+  };
+
 export const getTournament = async (
   tournamentId: number
 ): Promise<Tournament> => {
   const response = await authorizedApiClient.get<Tournament>(
+    `/tournaments/${tournamentId}`
+  );
+  return response.data;
+};
+
+export const getPublicTournament = async (
+  tournamentId: number
+): Promise<Tournament> => {
+  const response = await publicApiClient.get<Tournament>(
     `/tournaments/${tournamentId}`
   );
   return response.data;

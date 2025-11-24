@@ -34,6 +34,8 @@ export function Header() {
               <nav className="flex gap-4">
                 <Link to={ROUTES.adminUsers}>Пользаки</Link>
                 <Link to={ROUTES.adminTournaments}>Турниры</Link>
+                <Link to={ROUTES.adminApplications}>Заявки</Link>
+                <Link to={ROUTES.adminPlayers}>Игроки</Link>
               </nav>
             </AppCan>
           </div>

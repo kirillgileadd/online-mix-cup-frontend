@@ -1,16 +1,16 @@
 import { defineConfig } from "vite";
 import tailwindcss from "@tailwindcss/vite";
 import * as path from "path";
-import { ngrok } from "vite-plugin-ngrok";
+// import { ngrok } from "vite-plugin-ngrok";
 
 export default defineConfig({
   plugins: [
     tailwindcss(),
-    ngrok({
-      domain: "erich-phlogotic-dolores.ngrok-free.dev",
-      compression: true,
-      authtoken: "35hCeruGLGicmDS42PbASAIPGVo_7uFrHte3CFg7JbESSfPjA",
-    }),
+    // ngrok({
+    //   domain: "erich-phlogotic-dolores.ngrok-free.dev",
+    //   compression: true,
+    //   authtoken: "35hCeruGLGicmDS42PbASAIPGVo_7uFrHte3CFg7JbESSfPjA",
+    // }),
   ],
   resolve: {
     alias: {

@@ -5,10 +5,10 @@ import type { Player } from "./types.ts";
 interface PlayerStoreState {
   players: Player[];
   addPlayer: (player: Player) => void;
-  removePlayer: (playerId: string) => void;
+  removePlayer: (playerId: number) => void;
   setPlayers: (player: Player) => void; // now updates a single player
-  loseLives: (playerIds: string[]) => void; // decrement lives for losers
-  incrementChillZone: (playerIds: string[]) => void; // increment chillZoneValue for chill zone players
+  loseLives: (playerIds: number[]) => void; // decrement lives for losers
+  incrementChillZone: (playerIds: number[]) => void; // increment chillZoneValue for chill zone players
 }
 
 export const usePlayerStore = create<PlayerStoreState>()(
@@ -22,22 +22,22 @@ export const usePlayerStore = create<PlayerStoreState>()(
         set({
           players: get().players.map((p) => (p.id === player.id ? player : p)),
         }),
-      removePlayer: (playerId: string) =>
+      removePlayer: (playerId: number) =>
         set({ players: get().players.filter((p) => p.id !== playerId) }),
-      loseLives: (playerIds: string[]) =>
+      loseLives: (playerIds: number[]) =>
         set({
           players: get().players.map((p) =>
             playerIds.includes(p.id)
-              ? { ...p, lives: Math.max(0, p.lives - 1) }
-              : p,
+              ? { ...p, lives: Math.max(0, (p.lives ?? 0) - 1) }
+              : p
           ),
         }),
-      incrementChillZone: (playerIds: string[]) =>
+      incrementChillZone: (playerIds: number[]) =>
         set({
           players: get().players.map((p) =>
             playerIds.includes(p.id)
-              ? { ...p, chillZoneValue: p.chillZoneValue + 1 }
-              : p,
+              ? { ...p, chillZoneValue: (p.chillZoneValue ?? 0) + 1 }
+              : p
           ),
         }),
     }),
@@ -46,6 +46,6 @@ export const usePlayerStore = create<PlayerStoreState>()(
       partialize: (state) => ({
         players: state.players,
       }),
-    },
-  ),
+    }
+  )
 );

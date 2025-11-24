@@ -3,7 +3,11 @@ export const ROUTES = {
   login: "/login",
   adminUsers: "/admin/users",
   adminTournaments: "/admin/tournaments",
+  adminApplications: "/admin/applications",
+  adminPlayers: "/admin/players",
   forbidden: "/forbidden",
+  publicTournaments: "/tournaments",
+  publicTournament: (id: number) => `/tournaments/${id}`,
 } as const;
 
 type PathToTuple<T> = T extends `/${infer P1}/${infer Rest}`

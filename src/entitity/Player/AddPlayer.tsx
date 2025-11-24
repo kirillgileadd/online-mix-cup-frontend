@@ -17,7 +17,7 @@ export const AddPlayer: FC<AddPlayerProps> = ({ className }) => {
 
   const handleAddPlayer = () => {
     const newPlayer: Player = {
-      id: generateId(),
+      id: 1,
       nickname: `Nickname ${players.length + 1}`,
       mmr: Math.floor(Math.random() * (14000 - 1000 + 1)) + 1000,
       role: "1-2-3-4-5",

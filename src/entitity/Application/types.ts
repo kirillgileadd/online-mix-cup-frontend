@@ -1,14 +1,13 @@
-export type PlayerStatus = "active" | "eliminated" | "inactive";
+export type ApplicationStatus = "pending" | "approved" | "rejected";
 
-export interface Player {
+export interface Application {
   id: number;
   userId: number;
   tournamentId: number;
-  seed: number | null;
-  score: number | null;
-  chillZoneValue: number | null;
-  lives: number | null;
-  status: PlayerStatus;
+  mmr: number;
+  gameRoles: string;
+  nickname: string | null;
+  status: ApplicationStatus;
   createdAt: string;
   user?: {
     id: number;
@@ -20,3 +19,4 @@ export interface Player {
     name: string;
   };
 }
+
