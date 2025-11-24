@@ -42,7 +42,7 @@ export const LoginPage: FC<LoginPageProps> = ({ className }) => {
     window.TelegramOnAuthCb = async (user: TelegramUser) => {
       try {
         await loginByTelegram(user);
-        navigate("/tournament");
+        navigate(ROUTES.publicTournaments);
       } catch (e) {
         console.error("Telegram login failed", e);
       }
