@@ -8,7 +8,7 @@ import {
   devLogin,
   type TelegramUser,
 } from "../shared/api/auth.ts";
-import { Card, Button } from "@mantine/core";
+import { Card } from "@mantine/core";
 import { useMutation } from "@tanstack/react-query";
 
 type LoginPageProps = {
