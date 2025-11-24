@@ -3,13 +3,8 @@ import type { FC } from "react";
 import { useEffect } from "react";
 import { appSessionStore } from "../shared/session.ts";
 import { useNavigate } from "react-router-dom";
-import {
-  loginByTelegram,
-  devLogin,
-  type TelegramUser,
-} from "../shared/api/auth.ts";
+import { loginByTelegram, type TelegramUser } from "../shared/api/auth.ts";
 import { Card } from "@mantine/core";
-import { useMutation } from "@tanstack/react-query";
 
 type LoginPageProps = {
   className?: string;
@@ -24,15 +19,15 @@ export const LoginPage: FC<LoginPageProps> = ({ className }) => {
     }
   });
 
-  const devLoginMutation = useMutation({
-    mutationFn: devLogin,
-    onSuccess: () => {
-      navigate("/tournament");
-    },
-    onError: (e) => {
-      console.error("Dev login failed", e);
-    },
-  });
+  // const devLoginMutation = useMutation({
+  //   mutationFn: devLogin,
+  //   onSuccess: () => {
+  //     navigate("/tournament");
+  //   },
+  //   onError: (e) => {
+  //     console.error("Dev login failed", e);
+  //   },
+  // });
 
   const botName = import.meta.env.VITE_TELEGRAM_BOT_USERNAME as
     | string
