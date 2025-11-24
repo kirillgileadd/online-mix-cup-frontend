@@ -1,5 +1,9 @@
 # --- build stage ---
 FROM node:22-alpine AS builder
+ARG VITE_ENVOY_API_URL
+ARG VITE_TELEGRAM_BOT_USERNAME
+ENV VITE_ENVOY_API_URL=${VITE_ENVOY_API_URL}
+ENV VITE_TELEGRAM_BOT_USERNAME=${VITE_TELEGRAM_BOT_USERNAME}
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install --force --no-audit --no-fund

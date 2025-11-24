@@ -34,7 +34,9 @@ export const LoginPage: FC<LoginPageProps> = ({ className }) => {
     },
   });
 
-  const botName = import.meta.env.VITE_TELEGRAM_BOT_NAME as string | undefined;
+  const botName = import.meta.env.VITE_TELEGRAM_BOT_USERNAME as
+    | string
+    | undefined;
 
   useEffect(() => {
     if (!botName) {
