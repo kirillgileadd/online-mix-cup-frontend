@@ -41,7 +41,7 @@ const statusColors: Record<TournamentStatus, string> = {
   finished: "dark",
 };
 
-type TournamentTabValue = "players" | "rounds";
+type TournamentTabValue = "applications" | "players" | "rounds";
 
 export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
   className,
@@ -52,7 +52,8 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
   const tournamentQuery = useGetPublicTournament(tournamentId);
   const { lobbies, isLoading: lobbiesLoading } =
     useTournamentLobbiesLongPoll(tournamentId);
-  const [activeTab, setActiveTab] = useState<TournamentTabValue>("players");
+  const [activeTab, setActiveTab] =
+    useState<TournamentTabValue>("applications");
   const [playersRefreshToken, setPlayersRefreshToken] = useState(0);
 
   const handleTabChange = (value: string | null) => {
@@ -164,13 +165,16 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
           )}
         </Group>
 
-        <TournamentApplicationsTable tournamentId={tournamentId} />
-
         <Tabs value={activeTab} onChange={handleTabChange}>
           <Tabs.List>
+            <Tabs.Tab value="applications">Заявки</Tabs.Tab>
             <Tabs.Tab value="players">Игроки</Tabs.Tab>
             <Tabs.Tab value="rounds">Раунды</Tabs.Tab>
           </Tabs.List>
+
+          <Tabs.Panel value="applications" pt="lg">
+            <TournamentApplicationsTable tournamentId={tournamentId} />
+          </Tabs.Panel>
 
           <Tabs.Panel value="players" pt="lg">
             <TournamentPlayersTable
