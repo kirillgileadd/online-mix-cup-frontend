@@ -78,7 +78,7 @@ export const LoginPage: FC<LoginPageProps> = ({ className }) => {
       <Card>
         <p className="text-xl mb-4 text-center block">Войдите в аккаунт</p>
         <div id="tg-login-container" />
-        <Button
+        {/* <Button
           type="button"
           onClick={() => devLoginMutation.mutate()}
           loading={devLoginMutation.isPending}
@@ -86,7 +86,7 @@ export const LoginPage: FC<LoginPageProps> = ({ className }) => {
           mt="md"
         >
           Тестовый вход
-        </Button>
+        </Button> */}
       </Card>
     </div>
   );
