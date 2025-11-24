@@ -90,7 +90,6 @@ export const PlayerForm: FC<PlayerFormProps> = ({
     handleSubmit,
     control,
     setError,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<PlayerFormValues>({
     defaultValues: {
@@ -104,9 +103,6 @@ export const PlayerForm: FC<PlayerFormProps> = ({
     },
     values: formValues,
   });
-
-  console.log(errors, "errors");
-  console.log(watch(), "errors");
 
   const onSubmit = async (data: PlayerFormValues) => {
     await onSuccess(data, setError);

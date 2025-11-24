@@ -1,10 +1,23 @@
-import { Card, Title, Badge, Text, Group, Stack, Loader, Center } from "@mantine/core";
+import {
+  Card,
+  Title,
+  Badge,
+  Text,
+  Group,
+  Stack,
+  Loader,
+  Center,
+  Button,
+} from "@mantine/core";
+import { IconSettings } from "@tabler/icons-react";
 import clsx from "clsx";
 import { type FC } from "react";
 import { useGetPublicTournaments } from "../model/useGetPublicTournaments";
 import type { TournamentStatus } from "../../../entitity/Tournament";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../../../shared/routes";
+import { AppCan } from "../../../shared/authorization";
+import dayjs from "dayjs";
 
 type TournamentsListProps = {
   className?: string;
@@ -47,9 +60,19 @@ export const TournamentsList: FC<TournamentsListProps> = ({ className }) => {
 
   return (
     <div className={clsx("", className)}>
-      <Title size="h1" mb="xl">
-        Турниры
-      </Title>
+      <div className="flex justify-between items-center mb-8">
+        <Title size="h1">Турниры</Title>
+        <AppCan action={(permissions) => permissions.users.canManage()}>
+          <Button
+            component={Link}
+            to={ROUTES.adminUsers}
+            leftSection={<IconSettings size={16} />}
+            variant="light"
+          >
+            Админка
+          </Button>
+        </AppCan>
+      </div>
       {tournaments.length === 0 ? (
         <Text c="dimmed">Турниры не найдены</Text>
       ) : (
@@ -81,11 +104,7 @@ export const TournamentsList: FC<TournamentsListProps> = ({ className }) => {
                 {tournament.eventDate && (
                   <Text size="sm" c="dimmed">
                     Дата:{" "}
-                    {new Date(tournament.eventDate).toLocaleDateString("ru-RU", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                    {dayjs(tournament.eventDate).format("DD.MM.YYYY HH:mm")}
                   </Text>
                 )}
 
@@ -113,4 +132,3 @@ export const TournamentsList: FC<TournamentsListProps> = ({ className }) => {
     </div>
   );
 };
-

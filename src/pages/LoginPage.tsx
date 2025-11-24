@@ -30,8 +30,8 @@ export const LoginPage: FC<LoginPageProps> = ({ className }) => {
     onSuccess: () => {
       navigate(ROUTES.publicTournaments);
     },
-    onError: (e) => {
-      console.error("Dev login failed", e);
+    onError: () => {
+      // Dev login failed
     },
   });
 
@@ -48,8 +48,8 @@ export const LoginPage: FC<LoginPageProps> = ({ className }) => {
       try {
         await loginByTelegram(user);
         navigate(ROUTES.publicTournaments);
-      } catch (e) {
-        console.error("Telegram login failed", e);
+      } catch {
+        // Telegram login failed
       }
     };
 
@@ -61,14 +61,17 @@ export const LoginPage: FC<LoginPageProps> = ({ className }) => {
     script.setAttribute("data-onauth", "TelegramOnAuthCb(user)");
     script.setAttribute("data-lang", "ru");
 
-    script.onload = () => console.log("[TG] widget script loaded");
-    script.onerror = (e) => console.error("[TG] widget script error", e);
+    script.onload = () => {
+      // [TG] widget script loaded
+    };
+    script.onerror = () => {
+      // [TG] widget script error
+    };
 
     const container = document.getElementById("tg-login-container");
     container?.appendChild(script);
 
     return () => {
-      console.log("[TG] cleanup");
       window.TelegramOnAuthCb = undefined;
       script.remove();
     };

@@ -56,7 +56,6 @@ const createPermissionsFromRoles = (roles: string[] = []): AppPermissions => {
 
 function usePermissions(): AppPermissions {
   const session = appSessionStore.useSession();
-  console.log(session, "session");
   return createPermissionsFromRoles(session?.roles);
 }
 

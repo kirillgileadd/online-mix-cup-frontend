@@ -7,11 +7,8 @@ import { type FC, useMemo, useState } from "react";
 import { useGetPendingApplications } from "../model/useGetPendingApplications";
 import { useApproveApplication } from "../model/useApproveApplication";
 import { useRejectApplication } from "../model/useRejectApplication";
-import { useReactTable } from "../../../shared/useReactTable";
-import type {
-  Application,
-  ApplicationStatus,
-} from "../../../entitity/Application";
+import { useReactTable } from "@/shared/useReactTable";
+import type { Application, ApplicationStatus } from "@/entitity/Application";
 import { useGetTournaments } from "../../ManageTournament/model/useGetTournaments";
 
 type ApplicationsTableProps = {
@@ -36,8 +33,6 @@ export const ApplicationsTable: FC<ApplicationsTableProps> = ({
     tournamentId ? { tournamentId } : undefined
   );
   const tournamentsQuery = useGetTournaments();
-
-  console.log(applicationsQuery.data, "applicationsQuery.data");
 
   const tournamentOptions = useMemo(() => {
     return (

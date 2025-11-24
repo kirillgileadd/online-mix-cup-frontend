@@ -24,9 +24,6 @@ export const UsersTable: FC<UserRegistryPageProps> = ({ className }) => {
   const usersQuery = useGetUsers();
   const rolesQuery = useGetRoles();
 
-  console.log(rolesQuery.data, "rolesQuery.data");
-  console.log(usersQuery.data, "usersQuery.data");
-
   const roleLabelsMap = useMemo(() => {
     if (!rolesQuery.data) return {};
     const map: Record<string, string> = {};

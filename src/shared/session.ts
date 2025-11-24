@@ -25,13 +25,11 @@ class SessionStore {
   }
 
   setSessionToken(token: string) {
-    console.log(token, "token");
     localStorage.setItem(TOKEN_KEY, token);
     this.updateSessionSteam.emit({ type: "update", token });
   }
 
   removeSession() {
-    console.log("rm session");
     localStorage.removeItem(TOKEN_KEY);
     this.updateSessionSteam.emit({ type: "remove" });
   }
