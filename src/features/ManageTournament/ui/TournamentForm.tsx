@@ -125,7 +125,7 @@ export const TournamentForm: FC<TournamentFormProps> = ({
               <NumberInput
                 label="Призовой фонд"
                 placeholder="Введите призовой фонд"
-                value={field.value ?? null}
+                value={field.value ?? undefined}
                 onChange={(value) => field.onChange(value ?? null)}
                 error={errors.prizePool?.message}
                 min={0}

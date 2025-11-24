@@ -17,7 +17,7 @@ export const useTournamentLobbiesLongPoll = (tournamentId?: number) => {
     lobbies: [],
     isLoading: !!tournamentId,
   });
-  const lastUpdateRef = useRef<string | undefined>();
+  const lastUpdateRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     if (!tournamentId) {

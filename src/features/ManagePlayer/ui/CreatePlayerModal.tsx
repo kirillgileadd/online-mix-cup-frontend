@@ -30,8 +30,6 @@ export const CreatePlayerModal: FC<CreatePlayerModalProps> = ({
         tournamentId: playerData.tournamentId,
         nickname: playerData.nickname,
         mmr: playerData.mmr ?? undefined,
-        seed: playerData.seed,
-        score: playerData.score,
         chillZoneValue: playerData.chillZoneValue,
         lives: playerData.lives,
         status: playerData.status as "active" | "eliminated",

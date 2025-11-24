@@ -14,7 +14,7 @@ export const useGenerateLobbies = () => {
       const response = await generateLobbies(data);
       return response;
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.LOBBIES, variables.tournamentId],
       });

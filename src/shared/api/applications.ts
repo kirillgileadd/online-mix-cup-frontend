@@ -1,8 +1,5 @@
 import { authorizedApiClient, publicApiClient } from "./client";
-import type {
-  Application,
-  ApplicationStatus,
-} from "../../entitity/Application";
+import type { Application } from "../../entitity/Application";
 
 export type GetPendingApplicationsResponse = Application[];
 

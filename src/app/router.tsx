@@ -2,8 +2,6 @@ import { createBrowserRouter, Navigate, redirect } from "react-router-dom";
 import { appSessionStore } from "../shared/session.ts";
 import { LoginPage } from "../pages/LoginPage.tsx";
 import { App } from "./App.tsx";
-import { TournamentPage } from "../pages/TournamentPage.tsx";
-import { Lobby } from "../features/Lobby";
 import { Layout } from "./Layout.tsx";
 import { UserRole } from "../shared/types.ts";
 import { useRole } from "../shared/authorization.tsx";
@@ -64,8 +62,6 @@ export const router = createBrowserRouter([
           return null;
         },
         children: [
-          { path: "/tournament", element: <TournamentPage /> },
-          { path: "/lobbies", element: <Lobby /> },
           {
             path: ROUTES.adminUsers,
             element: (
