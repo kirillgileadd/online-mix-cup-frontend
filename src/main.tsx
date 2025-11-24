@@ -13,20 +13,23 @@ import { RouterProvider } from "react-router-dom"; //import MRT styles
 import { router } from "./app/router";
 import { AppPermissionsProvider } from "./shared/authorization.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ErrorBoundary } from "./app/ErrorBoundary.tsx";
 
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <MantineProvider defaultColorScheme="dark">
-        <ModalsProvider>
-          <AppPermissionsProvider>
-            <Notifications />
-            <RouterProvider router={router} />
-          </AppPermissionsProvider>
-        </ModalsProvider>
-      </MantineProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <MantineProvider defaultColorScheme="dark">
+          <ModalsProvider>
+            <AppPermissionsProvider>
+              <Notifications />
+              <RouterProvider router={router} />
+            </AppPermissionsProvider>
+          </ModalsProvider>
+        </MantineProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   </StrictMode>
 );

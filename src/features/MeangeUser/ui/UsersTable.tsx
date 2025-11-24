@@ -149,11 +149,8 @@ export const UsersTable: FC<UserRegistryPageProps> = ({ className }) => {
   return (
     <>
       <div className={clsx("", className)}>
-        <div className="flex gap-4 justify-between">
-          <Title size="h1" className="mb-6">
-            Реестр пользователей
-          </Title>
-
+        <div className="flex gap-4 justify-between mb-6">
+          <Title size="h1">Реестр пользователей</Title>
           <Button size="sm" onClick={createModal.createUser}>
             Создать пользователя
           </Button>

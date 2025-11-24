@@ -1,7 +1,12 @@
 import { ActionIcon, Button, Menu, Title, Badge } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import clsx from "clsx";
-import { IconDots, IconPray, IconEdit, IconSettings } from "@tabler/icons-react";
+import {
+  IconDots,
+  IconPray,
+  IconEdit,
+  IconSettings,
+} from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../../shared/routes";
 import { MantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
@@ -221,10 +226,8 @@ export const TournamentsTable: FC<TournamentsTableProps> = ({ className }) => {
   return (
     <>
       <div className={clsx("", className)}>
-        <div className="flex gap-4 justify-between">
-          <Title size="h1" className="mb-6">
-            Турниры
-          </Title>
+        <div className="flex gap-4 justify-between mb-6">
+          <Title size="h1">Турниры</Title>
 
           <Button size="sm" onClick={createModal.createTournament}>
             Создать турнир

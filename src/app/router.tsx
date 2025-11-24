@@ -13,6 +13,8 @@ import { PlayersPage } from "../pages/PlayersPage.tsx";
 import { PublicTournamentsPage } from "../pages/PublicTournamentsPage.tsx";
 import { PublicTournamentPage } from "../pages/PublicTournamentPage.tsx";
 import { AdminTournamentPage } from "../pages/AdminTournamentPage.tsx";
+import { ForbiddenPage } from "../pages/ForbiddenPage.tsx";
+import { NotFoundPage } from "../pages/NotFoundPage.tsx";
 
 // eslint-disable-next-line react-refresh/only-export-components
 function ProtectedRoute({
@@ -112,6 +114,18 @@ export const router = createBrowserRouter([
           return null;
         },
         children: [{ path: ROUTES.login, element: <LoginPage /> }],
+      },
+      {
+        path: ROUTES.forbidden,
+        element: <ForbiddenPage />,
+      },
+      {
+        path: ROUTES.notFound,
+        element: <NotFoundPage />,
+      },
+      {
+        path: "*",
+        element: <NotFoundPage />,
       },
     ],
   },

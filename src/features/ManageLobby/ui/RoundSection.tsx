@@ -17,10 +17,8 @@ export const RoundSection: FC<RoundSectionProps> = ({
   tournamentId,
   readonly,
 }) => {
-  const {
-    data: chillZonePlayers = [],
-    isLoading: chillZoneLoading,
-  } = useGetChillZonePlayers(tournamentId, round);
+  const { data: chillZonePlayers = [], isLoading: chillZoneLoading } =
+    useGetChillZonePlayers(tournamentId, round);
 
   return (
     <Stack gap="md">
@@ -40,7 +38,7 @@ export const RoundSection: FC<RoundSectionProps> = ({
               <Group
                 key={player.id}
                 justify="space-between"
-                className="rounded border border-gray-7 px-3 py-2 text-sm"
+                className="rounded border border-gray-700 px-3 py-2 text-sm"
               >
                 <Text fw={500}>{player.nickname}</Text>
                 <Text size="xs" c="dimmed">
@@ -64,5 +62,3 @@ export const RoundSection: FC<RoundSectionProps> = ({
     </Stack>
   );
 };
-
-

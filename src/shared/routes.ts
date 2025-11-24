@@ -7,6 +7,7 @@ export const ROUTES = {
   adminApplications: "/admin/applications",
   adminPlayers: "/admin/players",
   forbidden: "/forbidden",
+  notFound: "/404",
   publicTournaments: "/tournaments",
   publicTournament: (id: number) => `/tournaments/${id}`,
 } as const;
