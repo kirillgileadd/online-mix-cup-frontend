@@ -9,7 +9,8 @@
     "dev:ngrok:https": "vite & npx ngrok http https://localhost:5173",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepare": "husky"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -43,6 +44,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",
     "globals": "^16.4.0",
+    "husky": "^9.1.7",
     "ngrok": "^5.0.0-beta.2",
     "prettier": "^3.6.2",
     "sass-embedded": "^1.93.3",
