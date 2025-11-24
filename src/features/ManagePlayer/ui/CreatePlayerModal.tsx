@@ -28,6 +28,8 @@ export const CreatePlayerModal: FC<CreatePlayerModalProps> = ({
       const playerResponse = await createMutation.mutateAsync({
         userId: playerData.userId,
         tournamentId: playerData.tournamentId,
+        nickname: playerData.nickname,
+        mmr: playerData.mmr ?? undefined,
         seed: playerData.seed,
         score: playerData.score,
         chillZoneValue: playerData.chillZoneValue,

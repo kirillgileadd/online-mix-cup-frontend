@@ -1,4 +1,4 @@
-export type { Player } from "./types";
+export type { Player, PlayerStatus } from "./types";
 
 export { usePlayerStore } from "./player.store";
 

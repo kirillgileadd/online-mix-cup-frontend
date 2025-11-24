@@ -1,7 +1,9 @@
 import { ActionIcon, Button, Menu, Title, Badge } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import clsx from "clsx";
-import { IconDots, IconPray, IconEdit } from "@tabler/icons-react";
+import { IconDots, IconPray, IconEdit, IconSettings } from "@tabler/icons-react";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../../shared/routes";
 import { MantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
 import { type FC, useMemo } from "react";
 import { useGetTournaments } from "../model/useGetTournaments";
@@ -37,6 +39,7 @@ const statusOptions = [
 ];
 
 export const TournamentsTable: FC<TournamentsTableProps> = ({ className }) => {
+  const navigate = useNavigate();
   const createModal = useCreateTournamentModal();
   const updateModal = useUpdateTournamentModal();
   const updateMutation = useUpdateTournament();
@@ -161,6 +164,12 @@ export const TournamentsTable: FC<TournamentsTableProps> = ({ className }) => {
           </ActionIcon>
         </Menu.Target>
         <Menu.Dropdown>
+          <Menu.Item
+            leftSection={<IconSettings size={16} />}
+            onClick={() => navigate(ROUTES.adminTournament(row.original.id))}
+          >
+            Управление турниром
+          </Menu.Item>
           <Menu.Item
             leftSection={<IconEdit size={16} />}
             onClick={() => updateModal.updateTournament(row.original.id)}

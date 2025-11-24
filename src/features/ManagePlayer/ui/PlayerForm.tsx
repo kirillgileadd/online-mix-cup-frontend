@@ -6,6 +6,7 @@ import {
   Text,
   NumberInput,
   Select,
+  TextInput,
 } from "@mantine/core";
 import clsx from "clsx";
 import { type FC, useMemo } from "react";
@@ -18,8 +19,8 @@ import type { PlayerStatus } from "../../../entitity/Player";
 export type PlayerFormValues = {
   userId?: number;
   tournamentId?: number;
-  seed: number | null;
-  score: number | null;
+  nickname: string;
+  mmr: number | null;
   chillZoneValue: number | null;
   lives: number | null;
   status: PlayerStatus | "active" | "eliminated";
@@ -75,6 +76,8 @@ export const PlayerForm: FC<PlayerFormProps> = ({
     }
     const player = playerQuery.data;
     return {
+      nickname: player.nickname,
+      mmr: player.mmr ?? null,
       seed: player.seed,
       score: player.score,
       chillZoneValue: player.chillZoneValue,
@@ -87,19 +90,23 @@ export const PlayerForm: FC<PlayerFormProps> = ({
     handleSubmit,
     control,
     setError,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<PlayerFormValues>({
     defaultValues: {
-      userId: 0,
-      tournamentId: 0,
-      seed: null,
-      score: null,
+      userId: undefined,
+      tournamentId: undefined,
+      nickname: "",
+      mmr: null,
       chillZoneValue: null,
       lives: null,
       status: "active",
     },
     values: formValues,
   });
+
+  console.log(errors, "errors");
+  console.log(watch(), "errors");
 
   const onSubmit = async (data: PlayerFormValues) => {
     await onSuccess(data, setError);
@@ -123,15 +130,22 @@ export const PlayerForm: FC<PlayerFormProps> = ({
                 control={control}
                 rules={{
                   required: "Пользователь обязателен",
-                  validate: (value) => !value || value > 0 || "Выберите пользователя",
+                  validate: (value) =>
+                    !value || value > 0 || "Выберите пользователя",
                 }}
                 render={({ field }) => (
                   <Select
                     label="Пользователь"
                     placeholder="Выберите пользователя"
                     data={userOptions}
-                    value={field.value && field.value > 0 ? field.value.toString() : ""}
-                    onChange={(value) => field.onChange(value ? Number(value) : 0)}
+                    value={
+                      field.value && field.value > 0
+                        ? field.value.toString()
+                        : ""
+                    }
+                    onChange={(value) =>
+                      field.onChange(value ? Number(value) : 0)
+                    }
                     error={errors.userId?.message}
                     searchable
                   />
@@ -150,8 +164,14 @@ export const PlayerForm: FC<PlayerFormProps> = ({
                     label="Турнир"
                     placeholder="Выберите турнир"
                     data={tournamentOptions}
-                    value={field.value && field.value > 0 ? field.value.toString() : ""}
-                    onChange={(value) => field.onChange(value ? Number(value) : 0)}
+                    value={
+                      field.value && field.value > 0
+                        ? field.value.toString()
+                        : ""
+                    }
+                    onChange={(value) =>
+                      field.onChange(value ? Number(value) : 0)
+                    }
                     error={errors.tournamentId?.message}
                     searchable
                   />
@@ -161,31 +181,40 @@ export const PlayerForm: FC<PlayerFormProps> = ({
           )}
 
           <Controller
-            name="seed"
+            name="nickname"
             control={control}
+            rules={{
+              required: "Никнейм обязателен",
+              minLength: {
+                value: 2,
+                message: "Минимум 2 символа",
+              },
+            }}
             render={({ field }) => (
-              <NumberInput
-                label="Сид"
-                placeholder="Введите сид"
+              <TextInput
+                label="Никнейм"
+                placeholder="Введите никнейм"
                 {...field}
-                value={field.value ?? undefined}
-                onChange={(value) => field.onChange(value ?? null)}
-                error={errors.seed?.message}
+                error={errors.nickname?.message}
               />
             )}
           />
 
           <Controller
-            name="score"
+            name="mmr"
             control={control}
+            rules={{
+              required: "MMR обязателен",
+            }}
             render={({ field }) => (
               <NumberInput
-                label="Очки"
-                placeholder="Введите очки"
+                label="MMR"
+                placeholder="Введите MMR"
                 {...field}
                 value={field.value ?? undefined}
                 onChange={(value) => field.onChange(value ?? null)}
-                error={errors.score?.message}
+                error={errors.mmr?.message}
+                min={0}
               />
             )}
           />
@@ -241,4 +270,3 @@ export const PlayerForm: FC<PlayerFormProps> = ({
     </Box>
   );
 };
-

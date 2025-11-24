@@ -8,4 +8,6 @@ export const QUERY_KEYS = {
   APPLICATIONS: "applications",
   PLAYERS: "players",
   PLAYER: "player",
+  LOBBIES: "lobbies",
+  LOBBY: "lobby",
 } as const;

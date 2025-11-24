@@ -1,7 +1,7 @@
 import { Title, Badge, Loader, Center, Text } from "@mantine/core";
 import clsx from "clsx";
 import { MantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
-import { type FC, useMemo } from "react";
+import { type FC, useEffect, useMemo, useRef } from "react";
 import { useGetPublicPlayers } from "../model/useGetPublicPlayers";
 import { useReactTable } from "../../../shared/useReactTable";
 import type { Player, PlayerStatus } from "../../../entitity/Player";
@@ -9,6 +9,7 @@ import type { Player, PlayerStatus } from "../../../entitity/Player";
 type TournamentPlayersTableProps = {
   tournamentId: number;
   className?: string;
+  refreshToken?: number;
 };
 
 const statusLabels: Record<PlayerStatus, string> = {
@@ -26,8 +27,34 @@ const statusColors: Record<PlayerStatus, string> = {
 export const TournamentPlayersTable: FC<TournamentPlayersTableProps> = ({
   tournamentId,
   className,
+  refreshToken,
 }) => {
   const playersQuery = useGetPublicPlayers(tournamentId);
+  const isFirstRefetch = useRef(true);
+  const numericSortingFn = useMemo(
+    () => (rowA: any, rowB: any, columnId: string) => {
+      const valueA = Number(
+        rowA.getValue(columnId) ?? Number.NEGATIVE_INFINITY
+      );
+      const valueB = Number(
+        rowB.getValue(columnId) ?? Number.NEGATIVE_INFINITY
+      );
+      if (Number.isNaN(valueA) && Number.isNaN(valueB)) return 0;
+      if (Number.isNaN(valueA)) return 1;
+      if (Number.isNaN(valueB)) return -1;
+      return valueA - valueB;
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (refreshToken === undefined) return;
+    if (isFirstRefetch.current) {
+      isFirstRefetch.current = false;
+      return;
+    }
+    void playersQuery.refetch();
+  }, [refreshToken, playersQuery]);
 
   const columns = useMemo<MRT_ColumnDef<Player>[]>(
     () => [
@@ -39,30 +66,16 @@ export const TournamentPlayersTable: FC<TournamentPlayersTableProps> = ({
         filterFn: "contains",
       },
       {
-        accessorKey: "seed",
-        header: "Сид",
-        sortingFn: "numeric",
-        filterFn: "equals",
-        Cell: ({ cell }) => <>{cell.getValue() ?? "-"}</>,
-      },
-      {
-        accessorKey: "score",
-        header: "Очки",
-        sortingFn: "numeric",
-        filterFn: "equals",
-        Cell: ({ cell }) => <>{cell.getValue() ?? "-"}</>,
-      },
-      {
         accessorKey: "chillZoneValue",
         header: "Chill Zone",
-        sortingFn: "numeric",
+        sortingFn: numericSortingFn,
         filterFn: "equals",
         Cell: ({ cell }) => <>{cell.getValue() ?? "-"}</>,
       },
       {
         accessorKey: "lives",
         header: "Жизни",
-        sortingFn: "numeric",
+        sortingFn: numericSortingFn,
         filterFn: "equals",
         Cell: ({ cell }) => <>{cell.getValue() ?? "-"}</>,
       },
@@ -132,4 +145,3 @@ export const TournamentPlayersTable: FC<TournamentPlayersTableProps> = ({
     </div>
   );
 };
-

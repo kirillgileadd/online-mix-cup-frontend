@@ -7,10 +7,11 @@ import {
   Loader,
   Center,
   Button,
+  Tabs,
 } from "@mantine/core";
 import { IconArrowLeft, IconSend } from "@tabler/icons-react";
 import clsx from "clsx";
-import type { FC } from "react";
+import { type FC, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ROUTES } from "../shared/routes";
 import {
@@ -19,6 +20,8 @@ import {
   TournamentPlayersTable,
 } from "../features/PublicTournaments";
 import type { TournamentStatus } from "../entitity/Tournament";
+import { useTournamentLobbiesLongPoll } from "../features/ManageLobby";
+import { RoundSection } from "../features/ManageLobby/ui";
 
 type PublicTournamentPageProps = {
   className?: string;
@@ -38,6 +41,8 @@ const statusColors: Record<TournamentStatus, string> = {
   finished: "dark",
 };
 
+type TournamentTabValue = "players" | "rounds";
+
 export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
   className,
 }) => {
@@ -45,6 +50,27 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
   const navigate = useNavigate();
   const tournamentId = id ? Number(id) : 0;
   const tournamentQuery = useGetPublicTournament(tournamentId);
+  const { lobbies, isLoading: lobbiesLoading } =
+    useTournamentLobbiesLongPoll(tournamentId);
+  const [activeTab, setActiveTab] = useState<TournamentTabValue>("players");
+  const [playersRefreshToken, setPlayersRefreshToken] = useState(0);
+
+  const handleTabChange = (value: string | null) => {
+    if (!value) return;
+    const nextTab = value as TournamentTabValue;
+    setActiveTab(nextTab);
+    if (nextTab === "players") {
+      setPlayersRefreshToken((prev) => prev + 1);
+    }
+  };
+  const lobbiesByRound = useMemo(() => {
+    return lobbies.reduce<Record<number, typeof lobbies>>((acc, lobby) => {
+      const round = lobby.round;
+      if (!acc[round]) acc[round] = [];
+      acc[round].push(lobby);
+      return acc;
+    }, {});
+  }, [lobbies]);
 
   if (tournamentQuery.isLoading) {
     return (
@@ -63,6 +89,10 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
   }
 
   const tournament = tournamentQuery.data;
+
+  const roundNumbers = Object.keys(lobbiesByRound)
+    .map(Number)
+    .sort((a, b) => a - b);
 
   const telegramBotUsername =
     import.meta.env.VITE_TELEGRAM_BOT_USERNAME || "mixifycup_bot";
@@ -135,7 +165,43 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
         </Group>
 
         <TournamentApplicationsTable tournamentId={tournamentId} />
-        <TournamentPlayersTable tournamentId={tournamentId} />
+
+        <Tabs value={activeTab} onChange={handleTabChange}>
+          <Tabs.List>
+            <Tabs.Tab value="players">Игроки</Tabs.Tab>
+            <Tabs.Tab value="rounds">Раунды</Tabs.Tab>
+          </Tabs.List>
+
+          <Tabs.Panel value="players" pt="lg">
+            <TournamentPlayersTable
+              tournamentId={tournamentId}
+              refreshToken={playersRefreshToken}
+            />
+          </Tabs.Panel>
+
+          <Tabs.Panel value="rounds" pt="lg">
+            <Stack gap="md">
+              <Title order={2}>Раунды</Title>
+              {lobbiesLoading ? (
+                <Center py="xl">
+                  <Loader />
+                </Center>
+              ) : roundNumbers.length === 0 ? (
+                <Text c="dimmed">Лобби еще не были сгенерированы.</Text>
+              ) : (
+                roundNumbers.map((round) => (
+                  <RoundSection
+                    key={round}
+                    round={round}
+                    lobbies={lobbiesByRound[round] ?? []}
+                    tournamentId={tournamentId}
+                    readonly
+                  />
+                ))
+              )}
+            </Stack>
+          </Tabs.Panel>
+        </Tabs>
       </Stack>
     </div>
   );

@@ -20,10 +20,9 @@ export const useCreatePlayer = () => {
         { queryKey: [QUERY_KEYS.PLAYERS] },
         (oldData: GetPlayersResponse | undefined) => {
           if (!oldData || !playerResponse) return oldData;
-          return [...oldData, playerResponse];
+          return [playerResponse, ...oldData];
         }
       );
     },
   });
 };
-

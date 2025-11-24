@@ -12,6 +12,8 @@ export type GetPlayerResponse = Player;
 export interface CreatePlayerRequest {
   userId: number;
   tournamentId: number;
+  nickname: string;
+  mmr?: number | null;
   seed?: number | null;
   score?: number | null;
   chillZoneValue?: number | null;
@@ -23,6 +25,8 @@ export type CreatePlayerResponse = Player;
 
 export interface UpdatePlayerRequest {
   playerId: number;
+  nickname?: string;
+  mmr?: number | null;
   seed?: number | null;
   score?: number | null;
   chillZoneValue?: number | null;
@@ -79,6 +83,17 @@ export const getPublicPlayers = async (
 ): Promise<Player[]> => {
   const response = await publicApiClient.get<Player[]>(
     `/players?tournamentId=${tournamentId}`
+  );
+  return response.data;
+};
+
+export const getChillZonePlayers = async (
+  tournamentId: number,
+  round?: number
+): Promise<Player[]> => {
+  const query = round !== undefined ? `?round=${round}` : "";
+  const response = await publicApiClient.get<Player[]>(
+    `/players/tournament/${tournamentId}/chill-zone${query}`
   );
   return response.data;
 };

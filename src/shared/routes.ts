@@ -3,6 +3,7 @@ export const ROUTES = {
   login: "/login",
   adminUsers: "/admin/users",
   adminTournaments: "/admin/tournaments",
+  adminTournament: (id: number) => `/admin/tournaments/${id}`,
   adminApplications: "/admin/applications",
   adminPlayers: "/admin/players",
   forbidden: "/forbidden",

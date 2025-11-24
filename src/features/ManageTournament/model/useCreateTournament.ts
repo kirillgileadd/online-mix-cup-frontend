@@ -10,7 +10,11 @@ import { QUERY_KEYS } from "../../../shared/query-keys";
 export const useCreateTournament = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<CreateTournamentResponse, unknown, CreateTournamentRequest>({
+  return useMutation<
+    CreateTournamentResponse,
+    unknown,
+    CreateTournamentRequest
+  >({
     mutationFn: async (req) => {
       const response = await createTournament(req);
       return response;
@@ -21,10 +25,9 @@ export const useCreateTournament = () => {
         (oldData: GetTournamentsResponse | undefined) => {
           if (!oldData || !tournamentResponse) return oldData;
 
-          return [...oldData, tournamentResponse];
+          return [tournamentResponse, ...oldData];
         }
       );
     },
   });
 };
-

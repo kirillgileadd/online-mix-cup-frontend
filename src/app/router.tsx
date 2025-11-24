@@ -14,6 +14,7 @@ import { ApplicationsPage } from "../pages/ApplicationsPage.tsx";
 import { PlayersPage } from "../pages/PlayersPage.tsx";
 import { PublicTournamentsPage } from "../pages/PublicTournamentsPage.tsx";
 import { PublicTournamentPage } from "../pages/PublicTournamentPage.tsx";
+import { AdminTournamentPage } from "../pages/AdminTournamentPage.tsx";
 
 // eslint-disable-next-line react-refresh/only-export-components
 function ProtectedRoute({
@@ -78,6 +79,14 @@ export const router = createBrowserRouter([
             element: (
               <ProtectedRoute roles={[UserRole.ADMIN]}>
                 <TournamentsPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "/admin/tournaments/:id",
+            element: (
+              <ProtectedRoute roles={[UserRole.ADMIN]}>
+                <AdminTournamentPage />
               </ProtectedRoute>
             ),
           },

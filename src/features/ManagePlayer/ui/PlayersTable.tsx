@@ -1,9 +1,20 @@
-import { ActionIcon, Menu, Title, Badge, Select, Button, Group } from "@mantine/core";
-import { modals } from "@mantine/modals";
+import {
+  ActionIcon,
+  Menu,
+  Title,
+  Badge,
+  Select,
+  Button,
+  Group,
+} from "@mantine/core";
 import clsx from "clsx";
 import { IconDots, IconEdit, IconPlus } from "@tabler/icons-react";
-import { MantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
-import { type FC, useMemo, useState } from "react";
+import {
+  MantineReactTable,
+  type MRT_ColumnDef,
+  type MRT_SortingFn,
+} from "mantine-react-table";
+import { type FC, useEffect, useMemo, useRef, useState } from "react";
 import { useGetPlayers } from "../model/useGetPlayers";
 import { useReactTable } from "../../../shared/useReactTable";
 import type { Player, PlayerStatus } from "../../../entitity/Player";
@@ -13,6 +24,11 @@ import { useGetTournaments } from "../../ManageTournament/model/useGetTournament
 
 type PlayersTableProps = {
   className?: string;
+  title?: string;
+  lockedTournamentId?: number;
+  showCreateButton?: boolean;
+  showTournamentFilter?: boolean;
+  refreshToken?: number;
 };
 
 const statusLabels: Record<PlayerStatus, string> = {
@@ -27,16 +43,51 @@ const statusColors: Record<PlayerStatus, string> = {
   inactive: "gray",
 };
 
-export const PlayersTable: FC<PlayersTableProps> = ({ className }) => {
+const numericWithNulls: MRT_SortingFn<Player> = (rowA, rowB, columnId) => {
+  const a = rowA.getValue<number | null>(columnId);
+  const b = rowB.getValue<number | null>(columnId);
+  const valA = a ?? Number.NEGATIVE_INFINITY;
+  const valB = b ?? Number.NEGATIVE_INFINITY;
+  if (valA === valB) return 0;
+  return valA > valB ? 1 : -1;
+};
+
+export const PlayersTable: FC<PlayersTableProps> = ({
+  className,
+  title = "Игроки",
+  lockedTournamentId,
+  showCreateButton = true,
+  showTournamentFilter = true,
+  refreshToken,
+}) => {
   const [tournamentId, setTournamentId] = useState<number | undefined>(
-    undefined
+    lockedTournamentId
   );
+
+  useEffect(() => {
+    if (lockedTournamentId !== undefined) {
+      setTournamentId(lockedTournamentId);
+    }
+  }, [lockedTournamentId]);
+
+  const effectiveTournamentId =
+    lockedTournamentId !== undefined ? lockedTournamentId : tournamentId;
   const createModal = useCreatePlayerModal();
   const updateModal = useUpdatePlayerModal();
   const playersQuery = useGetPlayers(
-    tournamentId ? { tournamentId } : undefined
+    effectiveTournamentId ? { tournamentId: effectiveTournamentId } : undefined
   );
   const tournamentsQuery = useGetTournaments();
+  const shouldSkipFirstRefetch = useRef(true);
+
+  useEffect(() => {
+    if (refreshToken === undefined) return;
+    if (shouldSkipFirstRefetch.current) {
+      shouldSkipFirstRefetch.current = false;
+      return;
+    }
+    void playersQuery.refetch();
+  }, [refreshToken, playersQuery]);
 
   const tournamentOptions = useMemo(() => {
     return (
@@ -67,6 +118,12 @@ export const PlayersTable: FC<PlayersTableProps> = ({ className }) => {
         filterFn: "contains",
       },
       {
+        accessorKey: "nickname",
+        header: "Никнейм",
+        sortingFn: "alphanumeric",
+        filterFn: "contains",
+      },
+      {
         accessorKey: "tournament.name",
         header: "Турнир",
         accessorFn: (row) => row.tournament?.name || "-",
@@ -74,32 +131,25 @@ export const PlayersTable: FC<PlayersTableProps> = ({ className }) => {
         filterFn: "contains",
       },
       {
-        accessorKey: "seed",
-        header: "Сид",
-        sortingFn: "numeric",
+        accessorKey: "mmr",
+        header: "MMR",
+        sortingFn: numericWithNulls,
         filterFn: "equals",
-        Cell: ({ cell }) => <>{cell.getValue() ?? "-"}</>,
-      },
-      {
-        accessorKey: "score",
-        header: "Очки",
-        sortingFn: "numeric",
-        filterFn: "equals",
-        Cell: ({ cell }) => <>{cell.getValue() ?? "-"}</>,
+        Cell: ({ row }) => <>{row.original.mmr ?? "-"}</>,
       },
       {
         accessorKey: "chillZoneValue",
         header: "Chill Zone",
-        sortingFn: "numeric",
+        sortingFn: numericWithNulls,
         filterFn: "equals",
-        Cell: ({ cell }) => <>{cell.getValue() ?? "-"}</>,
+        Cell: ({ row }) => <>{row.original.chillZoneValue ?? "-"}</>,
       },
       {
         accessorKey: "lives",
         header: "Жизни",
-        sortingFn: "numeric",
+        sortingFn: numericWithNulls,
         filterFn: "equals",
-        Cell: ({ cell }) => <>{cell.getValue() ?? "-"}</>,
+        Cell: ({ row }) => <>{row.original.lives ?? "-"}</>,
       },
       {
         accessorKey: "status",
@@ -172,25 +222,34 @@ export const PlayersTable: FC<PlayersTableProps> = ({ className }) => {
 
   return (
     <div className={clsx("", className)}>
-      <div className="flex gap-4 justify-between items-center mb-6">
-        <Title size="h1">Игроки</Title>
+      <div className="flex gap-4 justify-between items-center mb-6 flex-wrap">
+        <Title size="h1">{title}</Title>
         <Group gap="md">
-          <Button
-            leftSection={<IconPlus size={16} />}
-            onClick={() => createModal.open()}
-          >
-            Создать игрока
-          </Button>
-          <Select
-            placeholder="Все турниры"
-            data={[{ value: "", label: "Все турниры" }, ...tournamentOptions]}
-            value={tournamentId?.toString() || ""}
-            onChange={(value) =>
-              setTournamentId(value ? Number(value) : undefined)
-            }
-            clearable
-            style={{ width: 250 }}
-          />
+          {showCreateButton && (
+            <Button
+              leftSection={<IconPlus size={16} />}
+              onClick={() => createModal.open()}
+            >
+              Создать игрока
+            </Button>
+          )}
+          {showTournamentFilter && lockedTournamentId === undefined && (
+            <Select
+              placeholder="Все турниры"
+              data={[{ value: "", label: "Все турниры" }, ...tournamentOptions]}
+              value={tournamentId?.toString() || ""}
+              onChange={(value) =>
+                setTournamentId(value ? Number(value) : undefined)
+              }
+              clearable
+              style={{ width: 250 }}
+            />
+          )}
+          {lockedTournamentId !== undefined && (
+            <Badge color="gray" variant="light">
+              Турнир #{lockedTournamentId}
+            </Badge>
+          )}
         </Group>
       </div>
       <MantineReactTable table={table} />
@@ -199,4 +258,3 @@ export const PlayersTable: FC<PlayersTableProps> = ({ className }) => {
     </div>
   );
 };
-
