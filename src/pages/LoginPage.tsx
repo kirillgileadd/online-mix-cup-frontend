@@ -5,6 +5,7 @@ import { appSessionStore } from "../shared/session.ts";
 import { useNavigate } from "react-router-dom";
 import { loginByTelegram, type TelegramUser } from "../shared/api/auth.ts";
 import { Card } from "@mantine/core";
+import { ROUTES } from "../shared/routes.ts";
 
 type LoginPageProps = {
   className?: string;
@@ -15,7 +16,7 @@ export const LoginPage: FC<LoginPageProps> = ({ className }) => {
 
   appSessionStore.updateSessionSteam.useEvent(() => {
     if (event?.type === "update") {
-      navigate("/tournament");
+      navigate(ROUTES.publicTournaments);
     }
   });
 
