@@ -166,6 +166,13 @@ export const PlayersTable: FC<PlayersTableProps> = ({
         ),
       },
       {
+        accessorKey: "gameRoles",
+        header: "Игровые роли",
+        sortingFn: "alphanumeric",
+        filterFn: "contains",
+        Cell: ({ row }) => <>{row.original.gameRoles ?? "-"}</>,
+      },
+      {
         accessorKey: "createdAt",
         header: "Дата создания",
         sortingFn: "datetime",

@@ -13,6 +13,7 @@ export interface Player {
   createdAt: string;
   mmr?: number | null;
   role?: string | null;
+  gameRoles?: string | null;
   user?: {
     id: number;
     telegramId: string;

@@ -21,26 +21,46 @@ export function Header() {
   if (!session) return;
 
   return (
-    <header className="bg-gray-700 shadow">
+    <header className="bg-dark-400 shadow">
       <div className="mx-auto px-4 sm:px-6">
         <div className="flex justify-between h-16">
           <div className="flex items-center gap-10">
-            <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="text-xl font-bold text-white">
+            <div className="shrink-0 flex items-center">
+              <Link to="/" className="text-xl font-bold text-dark-50">
                 Mixify
               </Link>
             </div>
             <AppCan action={(permissions) => permissions.users.canManage()}>
               <nav className="flex gap-4">
-                <Link to={ROUTES.adminUsers}>Пользаки</Link>
-                <Link to={ROUTES.adminTournaments}>Турниры</Link>
-                <Link to={ROUTES.adminApplications}>Заявки</Link>
-                <Link to={ROUTES.adminPlayers}>Игроки</Link>
+                <Link
+                  to={ROUTES.adminUsers}
+                  className="text-dark-100 hover:text-dark-50 transition-colors"
+                >
+                  Пользаки
+                </Link>
+                <Link
+                  to={ROUTES.adminTournaments}
+                  className="text-dark-100 hover:text-dark-50 transition-colors"
+                >
+                  Турниры
+                </Link>
+                <Link
+                  to={ROUTES.adminApplications}
+                  className="text-dark-100 hover:text-dark-50 transition-colors"
+                >
+                  Заявки
+                </Link>
+                <Link
+                  to={ROUTES.adminPlayers}
+                  className="text-dark-100 hover:text-dark-50 transition-colors"
+                >
+                  Игроки
+                </Link>
               </nav>
             </AppCan>
           </div>
           <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center gap-2">
+            <div className="shrink-0 flex items-center gap-2">
               {session?.photoUrl && (
                 <img
                   src={session.photoUrl}
@@ -50,7 +70,7 @@ export function Header() {
                   alt="avatar"
                 />
               )}
-              <span className="mr-4">{session.username}</span>
+              <span className="mr-4 text-dark-50">{session.username}</span>
             </div>
             <Button onClick={handleLogout} disabled={isTransitioning}>
               Выйти

@@ -38,7 +38,7 @@ export const RoundSection: FC<RoundSectionProps> = ({
               <Group
                 key={player.id}
                 justify="space-between"
-                className="rounded border border-gray-700 px-3 py-2 text-sm"
+                className="rounded border border-dark-400 px-3 py-2 text-sm"
               >
                 <Text fw={500}>{player.nickname}</Text>
                 <Text size="xs" c="dimmed">

@@ -19,6 +19,7 @@ export interface Participation {
     username: string;
     mmr: number;
     lives: number;
+    gameRoles?: string | null;
   };
 }
 

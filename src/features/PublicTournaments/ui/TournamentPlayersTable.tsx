@@ -93,6 +93,13 @@ export const TournamentPlayersTable: FC<TournamentPlayersTableProps> = ({
           </Badge>
         ),
       },
+      {
+        accessorKey: "gameRoles",
+        header: "Игровые роли",
+        sortingFn: "alphanumeric",
+        filterFn: "contains",
+        Cell: ({ row }) => <>{row.original.gameRoles ?? "-"}</>,
+      },
     ],
     []
   );

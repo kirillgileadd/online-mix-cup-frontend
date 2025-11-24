@@ -326,7 +326,7 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
             {lobby.participations.map((participant) => (
               <div
                 key={participant.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-gray-700 px-3 py-2 text-sm"
+                className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-dark-400 px-3 py-2 text-sm"
               >
                 <div className="flex items-center gap-2">
                   <Text fw={600}>{getPlayerName(participant)}</Text>
@@ -344,9 +344,27 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
                     </Badge>
                   )}
                 </div>
-                <div className="flex gap-4 text-xs text-gray-400">
-                  <span>MMR: {participant.player?.mmr ?? "-"}</span>
-                  <span>Жизни: {participant.player?.lives ?? "-"}</span>
+                <div className="flex flex-col gap-1 text-xs">
+                  <div className="flex gap-4 text-gray-400">
+                    <span>MMR: {participant.player?.mmr ?? "-"}</span>
+                    <span>Жизни: {participant.player?.lives ?? "-"}</span>
+                  </div>
+                  {participant.player?.gameRoles && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {participant.player.gameRoles
+                        .split(",")
+                        .map((role, idx) => (
+                          <Badge
+                            key={idx}
+                            size="xs"
+                            color="violet"
+                            variant="light"
+                          >
+                            {role.trim()}
+                          </Badge>
+                        ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
