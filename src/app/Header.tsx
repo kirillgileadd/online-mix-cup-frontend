@@ -25,9 +25,10 @@ export function Header() {
       <div className="mx-auto px-4 sm:px-6">
         <div className="flex justify-between h-16">
           <div className="flex items-center gap-10">
-            <div className="shrink-0 flex items-center">
-              <Link to="/" className="text-xl font-bold text-dark-50">
-                Mixify
+            <div className="shrink-0 flex items-center gap-2">
+              <Link to="/" className="flex items-center gap-2">
+                <img src="/favicon.svg" alt="Mixify Cup" className="h-8 w-8" />
+                <span className="text-xl font-bold text-dark-50">Mixify</span>
               </Link>
             </div>
             <AppCan action={(permissions) => permissions.users.canManage()}>
