@@ -3,9 +3,14 @@ import type { FC } from "react";
 import { useEffect } from "react";
 import { appSessionStore } from "../shared/session.ts";
 import { useNavigate } from "react-router-dom";
-import { loginByTelegram, type TelegramUser } from "../shared/api/auth.ts";
-import { Card } from "@mantine/core";
+import {
+  devLogin,
+  loginByTelegram,
+  type TelegramUser,
+} from "../shared/api/auth.ts";
+import { Button, Card } from "@mantine/core";
 import { ROUTES } from "../shared/routes.ts";
+import { useMutation } from "@tanstack/react-query";
 
 type LoginPageProps = {
   className?: string;
@@ -20,15 +25,15 @@ export const LoginPage: FC<LoginPageProps> = ({ className }) => {
     }
   });
 
-  // const devLoginMutation = useMutation({
-  //   mutationFn: devLogin,
-  //   onSuccess: () => {
-  //     navigate("/tournament");
-  //   },
-  //   onError: (e) => {
-  //     console.error("Dev login failed", e);
-  //   },
-  // });
+  const devLoginMutation = useMutation({
+    mutationFn: devLogin,
+    onSuccess: () => {
+      navigate(ROUTES.publicTournaments);
+    },
+    onError: (e) => {
+      console.error("Dev login failed", e);
+    },
+  });
 
   const botName = import.meta.env.VITE_TELEGRAM_BOT_USERNAME as
     | string
@@ -74,15 +79,17 @@ export const LoginPage: FC<LoginPageProps> = ({ className }) => {
       <Card>
         <p className="text-xl mb-4 text-center block">Войдите в аккаунт</p>
         <div id="tg-login-container" />
-        {/* <Button
-          type="button"
-          onClick={() => devLoginMutation.mutate()}
-          loading={devLoginMutation.isPending}
-          fullWidth
-          mt="md"
-        >
-          Тестовый вход
-        </Button> */}
+        {import.meta.env.VITE_NODE_ENV === "development" && (
+          <Button
+            type="button"
+            onClick={() => devLoginMutation.mutate()}
+            loading={devLoginMutation.isPending}
+            fullWidth
+            mt="md"
+          >
+            Тестовый вход
+          </Button>
+        )}
       </Card>
     </div>
   );

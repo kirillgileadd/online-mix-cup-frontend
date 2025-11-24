@@ -8,11 +8,11 @@ const getRefreshToken = async () => {
   if (!refreshPromise) {
     refreshPromise = (async () => {
       try {
-        const result = await publicApiClient.post<{ token: string }>(
-          "/refresh"
+        const result = await publicApiClient.post<{ accessToken: string }>(
+          "/auth/refresh"
         );
-        appSessionStore.setSessionToken(result.data.token);
-        return result.data.token;
+        appSessionStore.setSessionToken(result.data.accessToken);
+        return result.data.accessToken;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         appSessionStore.removeSession();
