@@ -20,6 +20,7 @@ export type PlayerFormValues = {
   userId?: number;
   tournamentId?: number;
   nickname: string;
+  gameRoles: string;
   mmr: number | null;
   chillZoneValue: number | null;
   lives: number | null;
@@ -77,6 +78,7 @@ export const PlayerForm: FC<PlayerFormProps> = ({
     const player = playerQuery.data;
     return {
       nickname: player.nickname,
+      gameRoles: player.gameRoles ?? "",
       mmr: player.mmr ?? null,
       seed: player.seed,
       score: player.score,
@@ -96,6 +98,7 @@ export const PlayerForm: FC<PlayerFormProps> = ({
       userId: undefined,
       tournamentId: undefined,
       nickname: "",
+      gameRoles: "",
       mmr: null,
       chillZoneValue: null,
       lives: null,
@@ -192,6 +195,19 @@ export const PlayerForm: FC<PlayerFormProps> = ({
                 placeholder="Введите никнейм"
                 {...field}
                 error={errors.nickname?.message}
+              />
+            )}
+          />
+
+          <Controller
+            name="gameRoles"
+            control={control}
+            render={({ field }) => (
+              <TextInput
+                label="Игровые роли"
+                placeholder="Введите роли (через запятую)"
+                {...field}
+                error={errors.gameRoles?.message}
               />
             )}
           />

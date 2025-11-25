@@ -13,6 +13,7 @@ export interface CreatePlayerRequest {
   userId: number;
   tournamentId: number;
   nickname: string;
+  gameRoles?: string | null;
   mmr?: number | null;
   seed?: number | null;
   score?: number | null;
@@ -26,6 +27,7 @@ export type CreatePlayerResponse = Player;
 export interface UpdatePlayerRequest {
   playerId: number;
   nickname?: string;
+  gameRoles?: string | null;
   mmr?: number | null;
   seed?: number | null;
   score?: number | null;

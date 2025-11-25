@@ -104,18 +104,6 @@ export const UserForm: FC<UserFormProps> = ({
             {...register("username")}
             error={errors.username?.message}
           />
-          <TextInput
-            label="Photo URL"
-            placeholder="Введите URL фото"
-            {...register("photoUrl")}
-            error={errors.photoUrl?.message}
-          />
-          <TextInput
-            label="Discord Username"
-            placeholder="Введите Discord username"
-            {...register("discordUsername")}
-            error={errors.discordUsername?.message}
-          />
           <Controller
             name="roles"
             control={control}
@@ -130,6 +118,18 @@ export const UserForm: FC<UserFormProps> = ({
                 error={errors.roles?.message}
               />
             )}
+          />
+          <TextInput
+            label="Photo URL"
+            placeholder="Введите URL фото"
+            {...register("photoUrl")}
+            error={errors.photoUrl?.message}
+          />
+          <TextInput
+            label="Discord Username"
+            placeholder="Введите Discord username"
+            {...register("discordUsername")}
+            error={errors.discordUsername?.message}
           />
           <Button type="submit">{userId ? "Обновить" : "Создать"}</Button>
         </Flex>

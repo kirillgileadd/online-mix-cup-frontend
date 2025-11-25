@@ -228,7 +228,6 @@ export const TournamentsTable: FC<TournamentsTableProps> = ({ className }) => {
       <div className={clsx("", className)}>
         <div className="flex gap-4 justify-between mb-6">
           <Title size="h1">Турниры</Title>
-
           <Button size="sm" onClick={createModal.createTournament}>
             Создать турнир
           </Button>
