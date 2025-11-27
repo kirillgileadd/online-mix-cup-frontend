@@ -64,6 +64,8 @@ export const PlayersTable: FC<PlayersTableProps> = ({
     lockedTournamentId
   );
 
+  console.log("lockedTournamentId", lockedTournamentId, tournamentId);
+
   useEffect(() => {
     if (lockedTournamentId !== undefined) {
       setTournamentId(lockedTournamentId);
@@ -99,7 +101,9 @@ export const PlayersTable: FC<PlayersTableProps> = ({
   }, [tournamentsQuery.data]);
 
   const handleEdit = (player: Player) => {
-    updateModal.open(player.id);
+    updateModal.open(player.id, {
+      tournamentId: effectiveTournamentId,
+    });
   };
 
   const columns = useMemo<MRT_ColumnDef<Player>[]>(
@@ -235,7 +239,9 @@ export const PlayersTable: FC<PlayersTableProps> = ({
           {showCreateButton && (
             <Button
               leftSection={<IconPlus size={16} />}
-              onClick={() => createModal.open()}
+              onClick={() =>
+                createModal.open({ tournamentId: effectiveTournamentId })
+              }
             >
               Создать игрока
             </Button>

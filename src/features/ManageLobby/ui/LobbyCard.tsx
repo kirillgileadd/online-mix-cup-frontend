@@ -299,8 +299,8 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
             </Badge>
           )}
         </Group>
-        <div className="flex gap-4">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 grow">
+        <div className="flex flex-col gap-4 md:flex-row">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:basis-1/2 md:flex-1 min-w-0">
             <div>
               <Group justify="space-between" mb="xs">
                 <Title order={5}>Команда 1</Title>
@@ -318,7 +318,7 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
             </div>
           </div>
 
-          <Stack gap="xs">
+          <Stack gap="xs" className="md:basis-1/2 md:flex-1 min-w-0">
             <Group justify="space-between" mb="xs">
               <Title order={5}>Игроки лобби</Title>
               <Badge color="blue">{lobby.participations.length}</Badge>
@@ -347,24 +347,8 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
                 <div className="flex flex-col gap-1 text-xs">
                   <div className="flex gap-4 text-gray-400">
                     <span>MMR: {participant.player?.mmr ?? "-"}</span>
-                    <span>Жизни: {participant.player?.lives ?? "-"}</span>
+                    <span>Роли: {participant.player?.gameRoles ?? "-"}</span>
                   </div>
-                  {participant.player?.gameRoles && (
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {participant.player.gameRoles
-                        .split(",")
-                        .map((role, idx) => (
-                          <Badge
-                            key={idx}
-                            size="xs"
-                            color="violet"
-                            variant="light"
-                          >
-                            {role.trim()}
-                          </Badge>
-                        ))}
-                    </div>
-                  )}
                 </div>
               </div>
             ))}

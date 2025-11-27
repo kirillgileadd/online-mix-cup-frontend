@@ -9,11 +9,13 @@ import type { UseFormSetError } from "react-hook-form";
 type CreatePlayerModalProps = {
   className?: string;
   onClose: (player?: Player) => void;
+  defaultTournamentId?: number;
 };
 
 export const CreatePlayerModal: FC<CreatePlayerModalProps> = ({
   className,
   onClose,
+  defaultTournamentId,
 }) => {
   const createMutation = useCreatePlayer();
 
@@ -67,8 +69,10 @@ export const CreatePlayerModal: FC<CreatePlayerModalProps> = ({
       onClose={onClose}
       opened={true}
     >
-      <PlayerForm onSuccess={onCreatePlayer} />
+      <PlayerForm
+        onSuccess={onCreatePlayer}
+        defaultTournamentId={defaultTournamentId}
+      />
     </Modal>
   );
 };
-

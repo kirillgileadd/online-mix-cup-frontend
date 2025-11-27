@@ -30,6 +30,7 @@ export type PlayerFormValues = {
 type PlayerFormProps = {
   className?: string;
   playerId?: number;
+  defaultTournamentId?: number;
   onSuccess: (
     player: PlayerFormValues,
     setError: UseFormSetError<PlayerFormValues>
@@ -48,6 +49,7 @@ export const PlayerForm: FC<PlayerFormProps> = ({
   onSuccess,
   error,
   playerId,
+  defaultTournamentId,
 }) => {
   const playerQuery = useGetPlayer(playerId);
   const usersQuery = useGetUsers();
@@ -96,7 +98,7 @@ export const PlayerForm: FC<PlayerFormProps> = ({
   } = useForm<PlayerFormValues>({
     defaultValues: {
       userId: undefined,
-      tournamentId: undefined,
+      tournamentId: defaultTournamentId,
       nickname: "",
       gameRoles: "",
       mmr: null,

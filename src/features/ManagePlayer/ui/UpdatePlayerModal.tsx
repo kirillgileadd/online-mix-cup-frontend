@@ -10,12 +10,14 @@ type UpdatePlayerModalProps = {
   className?: string;
   playerId: number;
   onClose: (player?: Player) => void;
+  defaultTournamentId?: number;
 };
 
 export const UpdatePlayerModal: FC<UpdatePlayerModalProps> = ({
   className,
   onClose,
   playerId,
+  defaultTournamentId,
 }) => {
   const updateMutation = useUpdatePlayer();
 
@@ -62,7 +64,11 @@ export const UpdatePlayerModal: FC<UpdatePlayerModalProps> = ({
       onClose={onClose}
       opened={true}
     >
-      <PlayerForm onSuccess={onUpdatePlayer} playerId={playerId} />
+      <PlayerForm
+        onSuccess={onUpdatePlayer}
+        playerId={playerId}
+        defaultTournamentId={defaultTournamentId}
+      />
     </Modal>
   );
 };
