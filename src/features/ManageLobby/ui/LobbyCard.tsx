@@ -9,8 +9,14 @@ import {
   Select,
   Text,
 } from "@mantine/core";
+import { modals } from "@mantine/modals";
 import type { Lobby, Participation } from "../../../shared/api/lobbies";
-import { useStartDraft, useDraftPick, useFinishLobby } from "../index";
+import {
+  useStartDraft,
+  useDraftPick,
+  useStartPlaying,
+  useFinishLobby,
+} from "../index";
 import { notifications } from "@mantine/notifications";
 
 type LobbyCardProps = {
@@ -48,9 +54,12 @@ const getStatusLabel = (status: Lobby["status"]) => {
   }
 };
 
+const getTeamLabel = (team: number) => (team === 1 ? "Команда 1" : "Команда 2");
+
 export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
   const startDraftMutation = useStartDraft();
   const draftPickMutation = useDraftPick();
+  const startPlayingMutation = useStartPlaying();
   const finishLobbyMutation = useFinishLobby();
 
   const getPlayerName = (participant: Participation) =>
@@ -87,6 +96,9 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
     () => lobby.participations.filter((p) => !p.team),
     [lobby.participations]
   );
+
+  const hasFullTeams =
+    team1.length === 5 && team2.length === 5 && lobby.status === "DRAFTING";
 
   // Определяем, кто должен выбирать сейчас
   const getCurrentPicker = () => {
@@ -143,7 +155,7 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
     }
   };
 
-  const handleDraftPick = async (playerId: number, team: number) => {
+  const handleDraftPick = async (playerId: number | null, team: number) => {
     try {
       await draftPickMutation.mutateAsync({
         lobbyId: lobby.id,
@@ -155,6 +167,24 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
         title: "Ошибка",
         message:
           error instanceof Error ? error.message : "Не удалось выбрать игрока",
+        color: "red",
+      });
+    }
+  };
+
+  const handleStartPlaying = async () => {
+    try {
+      await startPlayingMutation.mutateAsync({ lobbyId: lobby.id });
+      notifications.show({
+        title: "Успех",
+        message: "Игра начата",
+        color: "green",
+      });
+    } catch (error) {
+      notifications.show({
+        title: "Ошибка",
+        message:
+          error instanceof Error ? error.message : "Не удалось начать игру",
         color: "red",
       });
     }
@@ -219,19 +249,20 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
             data={buildPlayerOptions(slot?.playerId ?? null)}
             value={slot ? String(slot.playerId) : null}
             disabled={isDisabled}
-            description={
-              slot
-                ? `MMR: ${slot.player?.mmr ?? "-"} · Жизни: ${
-                    slot.player?.lives ?? "-"
-                  }${slot.isCaptain ? " · Капитан" : ""}`
-                : undefined
-            }
+            // description={
+            //   slot
+            //     ? `MMR: ${slot.player?.mmr ?? "-"} · Жизни: ${
+            //         slot.player?.lives ?? "-"
+            //       }${slot.isCaptain ? " · Капитан" : ""}`
+            //     : undefined
+            // }
             onChange={(value) => {
-              if (value && !readonly) {
-                handleDraftPick(Number(value), teamNumber);
+              if (!readonly) {
+                handleDraftPick(value ? Number(value) : null, teamNumber);
               }
             }}
-            clearable={!readonly && lobby.status === "DRAFTING"}
+            readOnly={index === 0}
+            clearable={!readonly && lobby.status === "DRAFTING" && index !== 0}
           />
         );
       })}
@@ -277,6 +308,16 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
             </>
           )}
 
+          {hasFullTeams && !readonly && (
+            <Button
+              onClick={handleStartPlaying}
+              loading={startPlayingMutation.isPending}
+              variant="light"
+            >
+              Начать игру
+            </Button>
+          )}
+
           {lobby.status === "PLAYING" && !readonly && (
             <Group>
               <Select
@@ -287,7 +328,18 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
                 ]}
                 onChange={(value) => {
                   if (value) {
-                    handleFinishLobby(Number(value));
+                    modals.openConfirmModal({
+                      title: "Подтвердите победителя",
+                      children: (
+                        <Text size="sm">
+                          Вы уверены, что команда {getTeamLabel(Number(value))}{" "}
+                          победила в этом лобби? Это действие нельзя отменить.
+                        </Text>
+                      ),
+                      labels: { confirm: "Подтвердить", cancel: "Отмена" },
+                      confirmProps: { color: "green" },
+                      onConfirm: () => handleFinishLobby(Number(value)),
+                    });
                   }
                 }}
               />
@@ -330,6 +382,12 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
               >
                 <div className="flex items-center gap-2">
                   <Text fw={600}>{getPlayerName(participant)}</Text>
+                  <div className="flex gap-4 text-gray-400">
+                    <span>MMR: {participant.player?.mmr ?? "-"}</span>
+                    <span>Роли: {participant.player?.gameRoles ?? "-"}</span>
+                  </div>
+                </div>
+                <div className="flex gap-1 text-xs">
                   {participant.isCaptain && (
                     <Badge size="xs" color="blue">
                       Капитан
@@ -343,12 +401,6 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
                       Команда {participant.team}
                     </Badge>
                   )}
-                </div>
-                <div className="flex flex-col gap-1 text-xs">
-                  <div className="flex gap-4 text-gray-400">
-                    <span>MMR: {participant.player?.mmr ?? "-"}</span>
-                    <span>Роли: {participant.player?.gameRoles ?? "-"}</span>
-                  </div>
                 </div>
               </div>
             ))}

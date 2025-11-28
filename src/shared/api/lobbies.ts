@@ -42,7 +42,7 @@ export type StartDraftResponse = Lobby;
 
 export interface DraftPickRequest {
   lobbyId: number;
-  playerId: number;
+  playerId: number | null;
   team: number;
 }
 
@@ -54,6 +54,12 @@ export interface FinishLobbyRequest {
 }
 
 export type FinishLobbyResponse = Lobby;
+
+export interface StartPlayingRequest {
+  lobbyId: number;
+}
+
+export type StartPlayingResponse = Lobby;
 
 export const generateLobbies = async (
   data: GenerateLobbiesRequest
@@ -79,6 +85,16 @@ export const draftPick = async (
 ): Promise<DraftPickResponse> => {
   const response = await authorizedApiClient.post<DraftPickResponse>(
     "/lobbies/draft-pick",
+    data
+  );
+  return response.data;
+};
+
+export const startPlaying = async (
+  data: StartPlayingRequest
+): Promise<StartPlayingResponse> => {
+  const response = await authorizedApiClient.post<StartPlayingResponse>(
+    "/lobbies/start-playing",
     data
   );
   return response.data;

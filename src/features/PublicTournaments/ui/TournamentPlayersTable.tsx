@@ -59,11 +59,32 @@ export const TournamentPlayersTable: FC<TournamentPlayersTableProps> = ({
   const columns = useMemo<MRT_ColumnDef<Player>[]>(
     () => [
       {
-        accessorKey: "user.username",
-        header: "Пользователь",
-        accessorFn: (row) => row.user?.username || row.user?.telegramId || "-",
+        id: "position",
+        header: "Место",
+        enableSorting: false,
+        enableColumnFilter: false,
+        size: 60,
+        Cell: ({ table, row }) => {
+          const sortedRows = table.getPrePaginationRowModel().rows;
+          const index = sortedRows.findIndex(
+            (sortedRow) => sortedRow.id === row.id
+          );
+          return index + 1;
+        },
+      },
+      {
+        accessorKey: "nickname",
+        header: "Игрок",
         sortingFn: "alphanumeric",
         filterFn: "contains",
+        Cell: ({ row }) => (
+          <>
+            {row.original.nickname ||
+              row.original.user?.username ||
+              row.original.user?.telegramId ||
+              "-"}
+          </>
+        ),
       },
       {
         accessorKey: "chillZoneValue",
@@ -101,7 +122,7 @@ export const TournamentPlayersTable: FC<TournamentPlayersTableProps> = ({
         Cell: ({ row }) => <>{row.original.gameRoles ?? "-"}</>,
       },
     ],
-    []
+    [numericSortingFn]
   );
 
   const table = useReactTable({
