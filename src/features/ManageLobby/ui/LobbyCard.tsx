@@ -58,7 +58,17 @@ const getStatusLabel = (status: Lobby["status"]) => {
   }
 };
 
-const getTeamLabel = (team: number) => (team === 1 ? "Команда 1" : "Команда 2");
+const getTeamLabel = (team: number, captain?: Participation | null) => {
+  if (captain) {
+    const namePattern = (name?: string) => `${name}'s Team`;
+    const name =
+      namePattern(captain.player?.nickname) ||
+      namePattern(captain.player?.username) ||
+      "Неизвестно";
+    return name;
+  }
+  return team === 1 ? "Команда 1" : "Команда 2";
+};
 
 export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
   const startDraftMutation = useStartDraft();
@@ -109,6 +119,18 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
 
   const hasFullTeams =
     team1.length === 5 && team2.length === 5 && lobby.status === "DRAFTING";
+
+  // Определяем победившую команду
+  const winningTeam = useMemo(() => {
+    if (lobby.status !== "FINISHED") return null;
+
+    const winners = lobby.participations.filter((p) => p.result === "WIN");
+    if (winners.length === 0) return null;
+
+    // Берем команду первого победителя (все в команде должны иметь одинаковый результат)
+    const winnerTeam = winners[0].team;
+    return winnerTeam || null;
+  }, [lobby.status, lobby.participations]);
 
   // Получаем капитанов
   const captains = useMemo(() => {
@@ -320,7 +342,7 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
       {Array.from({ length: 5 }).map((_, index) => {
         const slot = team[index];
         const label = `Игрок ${index + 1}`;
-        const isDisabled = lobby.status !== "DRAFTING" || !!readonly;
+        // const isDisabled = ;
 
         return (
           <Select
@@ -329,7 +351,7 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
             placeholder="Выберите игрока"
             data={buildPlayerOptions(slot?.playerId ?? null)}
             value={slot ? String(slot.playerId) : null}
-            disabled={isDisabled}
+            // disabled={isDisabled}
             // description={
             //   slot
             //     ? `MMR: ${slot.player?.mmr ?? "-"} · Жизни: ${
@@ -342,7 +364,7 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
                 handleDraftPick(value ? Number(value) : null, teamNumber);
               }
             }}
-            readOnly={index === 0}
+            readOnly={index === 0 || readonly || lobby.status !== "DRAFTING"}
             clearable={!readonly && lobby.status === "DRAFTING" && index !== 0}
           />
         );
@@ -362,6 +384,15 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
             <Text size="sm" c="dimmed">
               Раунд {lobby.round}
             </Text>
+            {winningTeam && (
+              <Badge color="green" size="lg" variant="light">
+                🏆 Победитель:{" "}
+                {getTeamLabel(
+                  winningTeam,
+                  winningTeam === 1 ? captain1 : captain2
+                )}
+              </Badge>
+            )}
           </Group>
 
           {lobby.status === "PENDING" && !readonly && (
@@ -395,11 +426,11 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
                       data={[
                         {
                           value: String(captain1.playerId),
-                          label: `${getPlayerName(captain1)} (Команда 1)`,
+                          label: getPlayerName(captain1),
                         },
                         {
                           value: String(captain2.playerId),
-                          label: `${getPlayerName(captain2)} (Команда 2)`,
+                          label: getPlayerName(captain2),
                         },
                       ]}
                       value={firstPickerId ? String(firstPickerId) : null}
@@ -445,22 +476,33 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
               <Select
                 placeholder="Выберите победителя"
                 data={[
-                  { value: "1", label: "Команда 1" },
-                  { value: "2", label: "Команда 2" },
+                  {
+                    value: "1",
+                    label: getTeamLabel(1, captain1),
+                  },
+                  {
+                    value: "2",
+                    label: getTeamLabel(2, captain2),
+                  },
                 ]}
                 onChange={(value) => {
                   if (value) {
+                    const teamNumber = Number(value);
                     modals.openConfirmModal({
                       title: "Подтвердите победителя",
                       children: (
                         <Text size="sm">
-                          Вы уверены, что команда {getTeamLabel(Number(value))}{" "}
+                          Вы уверены, что команда{" "}
+                          {getTeamLabel(
+                            teamNumber,
+                            teamNumber === 1 ? captain1 : captain2
+                          )}{" "}
                           победила в этом лобби? Это действие нельзя отменить.
                         </Text>
                       ),
                       labels: { confirm: "Подтвердить", cancel: "Отмена" },
                       confirmProps: { color: "green" },
-                      onConfirm: () => handleFinishLobby(Number(value)),
+                      onConfirm: () => handleFinishLobby(teamNumber),
                     });
                   }
                 }}
@@ -477,7 +519,7 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:basis-1/2 md:flex-1 min-w-0">
             <div>
               <Group justify="space-between" mb="xs">
-                <Title order={5}>Команда 1</Title>
+                <Title order={5}>{getTeamLabel(1, captain1)}</Title>
                 <Badge color="gray">{team1.length}/5</Badge>
               </Group>
               {renderDraftSelects(1, team1)}
@@ -485,7 +527,7 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
 
             <div>
               <Group justify="space-between" mb="xs">
-                <Title order={5}>Команда 2</Title>
+                <Title order={5}>{getTeamLabel(2, captain2)}</Title>
                 <Badge color="gray">{team2.length}/5</Badge>
               </Group>
               {renderDraftSelects(2, team2)}
@@ -521,7 +563,10 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
                         size="xs"
                         color={participant.team === 1 ? "teal" : "grape"}
                       >
-                        Команда {participant.team}
+                        {getTeamLabel(
+                          participant.team,
+                          participant.team === 1 ? captain1 : captain2
+                        )}
                       </Badge>
                     )}
                   </div>
