@@ -9,6 +9,8 @@ export interface Application {
   nickname: string | null;
   status: ApplicationStatus;
   createdAt: string;
+  dotabuff?: string | null;
+  receiptImageUrl?: string | null;
   user?: {
     id: number;
     telegramId: string;
@@ -19,4 +21,3 @@ export interface Application {
     name: string;
   };
 }
-

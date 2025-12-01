@@ -61,6 +61,13 @@ export interface StartPlayingRequest {
 
 export type StartPlayingResponse = Lobby;
 
+export interface ReplacePlayerRequest {
+  lobbyId: number;
+  playerId: number;
+}
+
+export type ReplacePlayerResponse = Lobby;
+
 export const generateLobbies = async (
   data: GenerateLobbiesRequest
 ): Promise<GenerateLobbiesResponse> => {
@@ -105,6 +112,16 @@ export const finishLobby = async (
 ): Promise<FinishLobbyResponse> => {
   const response = await authorizedApiClient.post<FinishLobbyResponse>(
     "/lobbies/finish-lobby",
+    data
+  );
+  return response.data;
+};
+
+export const replacePlayer = async (
+  data: ReplacePlayerRequest
+): Promise<ReplacePlayerResponse> => {
+  const response = await authorizedApiClient.post<ReplacePlayerResponse>(
+    "/lobbies/replace-player",
     data
   );
   return response.data;

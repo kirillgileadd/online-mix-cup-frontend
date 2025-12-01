@@ -35,7 +35,7 @@ export function useReactTable<TData extends MRT_RowData>(
                 props: JSX.IntrinsicAttributes & IconProps & RefAttributes<Icon>,
             ) => <IconSelector {...props} />,
         },
-        initialState: { ...tableOptions.initialState, density: "xs" },
+        initialState: { ...tableOptions.initialState, density: "xs", pagination: { pageSize: 50, pageIndex: 0 } },
         displayColumnDefOptions: {
             "mrt-row-actions": {
                 size: 30, // узкая колонка

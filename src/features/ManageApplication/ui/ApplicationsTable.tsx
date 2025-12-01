@@ -1,4 +1,4 @@
-import { ActionIcon, Menu, Title, Badge, Select } from "@mantine/core";
+import { ActionIcon, Menu, Title, Badge, Select, Image } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import clsx from "clsx";
 import { IconDots, IconCheck, IconX } from "@tabler/icons-react";
@@ -143,6 +143,50 @@ export const ApplicationsTable: FC<ApplicationsTableProps> = ({
             {statusLabels[cell.getValue() as ApplicationStatus]}
           </Badge>
         ),
+      },
+      {
+        accessorKey: "dotabuff",
+        header: "Dotabuff",
+        sortingFn: "alphanumeric",
+        filterFn: "contains",
+        Cell: ({ cell }) => {
+          const value = cell.getValue() as string | null | undefined;
+          if (!value) return <>-</>;
+          return (
+            <a
+              href={value}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:underline"
+            >
+              {value}
+            </a>
+          );
+        },
+      },
+      {
+        accessorKey: "receiptImageUrl",
+        header: "Чек",
+        sortingFn: "alphanumeric",
+        filterFn: "contains",
+        Cell: ({ cell }) => {
+          const value = cell.getValue() as string | null | undefined;
+          if (!value) return <>-</>;
+          const imageUrl = `${import.meta.env.VITE_ENVOY_API_URL}${value}`;
+          return (
+            <Image
+              src={imageUrl}
+              alt="Чек"
+              width={100}
+              height={100}
+              fit="contain"
+              className="cursor-pointer"
+              onClick={() => {
+                window.open(imageUrl, "_blank");
+              }}
+            />
+          );
+        },
       },
       {
         accessorKey: "createdAt",

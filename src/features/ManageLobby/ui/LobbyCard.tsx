@@ -1,4 +1,4 @@
-import { type FC, useMemo } from "react";
+import { type FC, useMemo, useState, useEffect } from "react";
 import {
   Card,
   Title,
@@ -8,7 +8,10 @@ import {
   Stack,
   Select,
   Text,
+  ActionIcon,
+  Tooltip,
 } from "@mantine/core";
+import { IconReplace } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
 import type { Lobby, Participation } from "../../../shared/api/lobbies";
 import {
@@ -16,6 +19,7 @@ import {
   useDraftPick,
   useStartPlaying,
   useFinishLobby,
+  useReplacePlayer,
 } from "../index";
 import { notifications } from "@mantine/notifications";
 
@@ -61,6 +65,12 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
   const draftPickMutation = useDraftPick();
   const startPlayingMutation = useStartPlaying();
   const finishLobbyMutation = useFinishLobby();
+  const replacePlayerMutation = useReplacePlayer();
+
+  // Победитель жребия (рандомно выбранный капитан)
+  const [lotteryWinnerId, setLotteryWinnerId] = useState<number | null>(null);
+  // Капитан, который будет делать первый пик (выбирается победителем жребия)
+  const [firstPickerId, setFirstPickerId] = useState<number | null>(null);
 
   const getPlayerName = (participant: Participation) =>
     participant.player?.nickname ||
@@ -100,39 +110,69 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
   const hasFullTeams =
     team1.length === 5 && team2.length === 5 && lobby.status === "DRAFTING";
 
+  // Получаем капитанов
+  const captains = useMemo(() => {
+    return lobby.participations.filter((p) => p.isCaptain);
+  }, [lobby.participations]);
+
+  const captain1 = useMemo(
+    () => captains.find((p) => p.team === 1),
+    [captains]
+  );
+  const captain2 = useMemo(
+    () => captains.find((p) => p.team === 2),
+    [captains]
+  );
+
+  // Рандомно выбираем победителя жребия при начале драфта
+  useEffect(() => {
+    if (
+      lobby.status === "DRAFTING" &&
+      captain1 &&
+      captain2 &&
+      lotteryWinnerId === null
+    ) {
+      // Рандомно выбираем победителя жребия (50/50)
+      const random = Math.random() < 0.5;
+      const winner = random ? captain1 : captain2;
+      setLotteryWinnerId(winner.playerId);
+    }
+    // Сбрасываем при смене статуса на PENDING
+    if (lobby.status === "PENDING") {
+      setLotteryWinnerId(null);
+      setFirstPickerId(null);
+    }
+  }, [lobby.status, captain1, captain2, lotteryWinnerId]);
+
   // Определяем, кто должен выбирать сейчас
   const getCurrentPicker = () => {
     if (lobby.status !== "DRAFTING") return null;
 
-    const captains = lobby.participations.filter((p) => p.isCaptain);
-    const captain1 = captains.find((p) => p.team === 1);
-    const captain2 = captains.find((p) => p.team === 2);
-
     if (!captain1 || !captain2) return null;
+
+    // Если еще не выбран первый пикер, возвращаем null
+    if (firstPickerId === null) return null;
 
     // Считаем количество выбранных игроков (не капитанов)
     const pickedCount = lobby.participations.filter(
       (p) => p.pickedAt && !p.isCaptain
     ).length;
 
-    // Определяем порядок выбора
-    const captain1MMR = captain1.player?.mmr || 0;
-    const captain2MMR = captain2.player?.mmr || 0;
+    // Определяем капитанов на основе выбранного первого пикера
+    const firstPicker =
+      firstPickerId === captain1.playerId ? captain1 : captain2;
+    const secondPicker =
+      firstPickerId === captain1.playerId ? captain2 : captain1;
 
-    // Капитан с большим MMR начинает первым
-    const higherMMRCaptain = captain1MMR >= captain2MMR ? captain1 : captain2;
-    const lowerMMRCaptain = captain1MMR >= captain2MMR ? captain2 : captain1;
-
-    // Первый выбор делает капитан с большим MMR
-    // Затем по очереди: 1-2-2-1-1-2-2-1-1-2
+    // Первый выбор делает выбранный капитан
     if (pickedCount === 0) {
-      return higherMMRCaptain;
+      return firstPicker;
     }
 
     // Паттерн выбора: 1-2-2-1-1-2-2-1-1-2
-    const pattern = [0, 1, 1, 0, 0, 1, 1, 0, 0, 1]; // 0 = higher, 1 = lower
+    const pattern = [0, 1, 1, 0, 0, 1, 1, 0, 0, 1]; // 0 = firstPicker, 1 = secondPicker
     const turn = pattern[pickedCount % pattern.length];
-    return turn === 0 ? higherMMRCaptain : lowerMMRCaptain;
+    return turn === 0 ? firstPicker : secondPicker;
   };
 
   const currentPicker = getCurrentPicker();
@@ -208,6 +248,47 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
           error instanceof Error ? error.message : "Не удалось завершить лобби",
         color: "red",
       });
+    }
+  };
+
+  const handleReplacePlayer = async (playerId: number) => {
+    try {
+      modals.openConfirmModal({
+        title: "Подтвердите замену игрока",
+        children: (
+          <Text size="sm">
+            Вы уверены, что хотите заменить этого игрока? Игрок получит -1
+            жизнь, а лобби перейдет в статус PENDING. Все игроки потеряют статус
+            капитанов и команды.
+          </Text>
+        ),
+        labels: { confirm: "Заменить", cancel: "Отмена" },
+        confirmProps: { color: "orange" },
+        onConfirm: async () => {
+          try {
+            await replacePlayerMutation.mutateAsync({
+              lobbyId: lobby.id,
+              playerId,
+            });
+            notifications.show({
+              title: "Успех",
+              message: "Игрок заменен",
+              color: "green",
+            });
+          } catch (error) {
+            notifications.show({
+              title: "Ошибка",
+              message:
+                error instanceof Error
+                  ? error.message
+                  : "Не удалось заменить игрока",
+              color: "red",
+            });
+          }
+        },
+      });
+    } catch (error) {
+      // Ошибка открытия модального окна
     }
   };
 
@@ -296,10 +377,51 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
             <>
               {team1.length === 5 && team2.length === 5 ? (
                 <Badge color="green">Драфт завершен</Badge>
-              ) : currentPicker ? (
-                <Text size="sm" c="blue" fw={500}>
-                  Выбирает: {getPlayerName(currentPicker)}
-                </Text>
+              ) : captain1 && captain2 ? (
+                <Group gap="md" align="center">
+                  {lotteryWinnerId && (
+                    <Text size="sm" c="yellow" fw={500}>
+                      🎲 Победитель жребия:{" "}
+                      {getPlayerName(
+                        lotteryWinnerId === captain1.playerId
+                          ? captain1
+                          : captain2
+                      )}
+                    </Text>
+                  )}
+                  {lotteryWinnerId && firstPickerId === null && !readonly && (
+                    <Select
+                      placeholder="Выберите первого пикера"
+                      data={[
+                        {
+                          value: String(captain1.playerId),
+                          label: `${getPlayerName(captain1)} (Команда 1)`,
+                        },
+                        {
+                          value: String(captain2.playerId),
+                          label: `${getPlayerName(captain2)} (Команда 2)`,
+                        },
+                      ]}
+                      value={firstPickerId ? String(firstPickerId) : null}
+                      onChange={(value) => {
+                        if (value) {
+                          setFirstPickerId(Number(value));
+                        }
+                      }}
+                      style={{ minWidth: 220 }}
+                    />
+                  )}
+                  {currentPicker && (
+                    <Text size="sm" c="blue" fw={500}>
+                      Выбирает: {getPlayerName(currentPicker)}
+                    </Text>
+                  )}
+                  {!lotteryWinnerId && (
+                    <Text size="sm" c="dimmed">
+                      Ожидание начала драфта
+                    </Text>
+                  )}
+                </Group>
               ) : (
                 <Text size="sm" c="dimmed">
                   Ожидание начала драфта
@@ -387,19 +509,36 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
                     <span>Роли: {participant.player?.gameRoles ?? "-"}</span>
                   </div>
                 </div>
-                <div className="flex gap-1 text-xs">
-                  {participant.isCaptain && (
-                    <Badge size="xs" color="blue">
-                      Капитан
-                    </Badge>
-                  )}
-                  {participant.team && (
-                    <Badge
-                      size="xs"
-                      color={participant.team === 1 ? "teal" : "grape"}
-                    >
-                      Команда {participant.team}
-                    </Badge>
+                <div className="flex items-center gap-1">
+                  <div className="flex gap-1 text-xs">
+                    {participant.isCaptain && (
+                      <Badge size="xs" color="blue">
+                        Капитан
+                      </Badge>
+                    )}
+                    {participant.team && (
+                      <Badge
+                        size="xs"
+                        color={participant.team === 1 ? "teal" : "grape"}
+                      >
+                        Команда {participant.team}
+                      </Badge>
+                    )}
+                  </div>
+                  {!readonly && (
+                    <Tooltip label="Заменить игрока">
+                      <ActionIcon
+                        variant="subtle"
+                        color="orange"
+                        size="sm"
+                        onClick={() =>
+                          handleReplacePlayer(participant.playerId)
+                        }
+                        loading={replacePlayerMutation.isPending}
+                      >
+                        <IconReplace size={16} />
+                      </ActionIcon>
+                    </Tooltip>
                   )}
                 </div>
               </div>
