@@ -8,6 +8,7 @@ import {
   Loader,
   Center,
   Button,
+  Image,
 } from "@mantine/core";
 import { IconSettings } from "@tabler/icons-react";
 import clsx from "clsx";
@@ -89,6 +90,26 @@ export const TournamentsList: FC<TournamentsListProps> = ({ className }) => {
               className="hover:shadow-md transition-shadow cursor-pointer"
             >
               <Stack gap="md">
+                {tournament?.previewUrl && (
+                  <div
+                    style={{
+                      height: 200,
+                      overflow: "hidden",
+                      borderRadius: "var(--mantine-radius-md)",
+                    }}
+                  >
+                    <Image
+                      src={tournament.previewUrl}
+                      alt={tournament.name}
+                      fit="cover"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </div>
+                )}
                 <Group justify="space-between" align="flex-start">
                   <Title order={3} lineClamp={2}>
                     {tournament.name}

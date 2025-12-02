@@ -43,6 +43,7 @@ export const TournamentForm: FC<TournamentFormProps> = ({
       eventDate: tournament.eventDate,
       price: tournament.price,
       prizePool: tournament.prizePool,
+      previewUrl: tournament.previewUrl,
     };
   }, [tournamentQuery.data, tournamentId]);
 
@@ -58,6 +59,7 @@ export const TournamentForm: FC<TournamentFormProps> = ({
       eventDate: null,
       price: 0,
       prizePool: null,
+      previewUrl: null,
     },
     values: formValues,
   });
@@ -119,7 +121,10 @@ export const TournamentForm: FC<TournamentFormProps> = ({
             name="prizePool"
             control={control}
             rules={{
-              min: { value: 0, message: "Призовой фонд должен быть не меньше 0" },
+              min: {
+                value: 0,
+                message: "Призовой фонд должен быть не меньше 0",
+              },
             }}
             render={({ field }) => (
               <NumberInput
@@ -132,12 +137,15 @@ export const TournamentForm: FC<TournamentFormProps> = ({
               />
             )}
           />
-          <Button type="submit">
-            {tournamentId ? "Обновить" : "Создать"}
-          </Button>
+          <TextInput
+            label="URL превью изображения"
+            placeholder="Введите URL изображения (необязательно)"
+            {...register("previewUrl")}
+            error={errors.previewUrl?.message}
+          />
+          <Button type="submit">{tournamentId ? "Обновить" : "Создать"}</Button>
         </Flex>
       </form>
     </Box>
   );
 };
-

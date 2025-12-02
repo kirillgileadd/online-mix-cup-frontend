@@ -7,6 +7,6 @@ export interface Tournament {
   eventDate: string | null;
   price: number;
   prizePool: number | null;
+  previewUrl?: string | null;
   createdAt: string;
 }
-
