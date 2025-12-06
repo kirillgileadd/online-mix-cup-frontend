@@ -6,14 +6,11 @@ import {
   Stack,
   Loader,
   Center,
-  Button,
   Tabs,
 } from "@mantine/core";
-import { IconArrowLeft, IconSend } from "@tabler/icons-react";
 import clsx from "clsx";
 import { type FC, useMemo, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { ROUTES } from "../shared/routes";
+import { useParams } from "react-router-dom";
 import {
   useGetPublicTournament,
   TournamentApplicationsTable,
@@ -47,7 +44,6 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
   className,
 }) => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const tournamentId = id ? Number(id) : 0;
   const tournamentQuery = useGetPublicTournament(tournamentId);
   const { lobbies, isLoading: lobbiesLoading } =
@@ -95,14 +91,10 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
     .map(Number)
     .sort((a, b) => a - b);
 
-  const telegramBotUsername =
-    import.meta.env.VITE_TELEGRAM_BOT_USERNAME || "mixifycup_bot";
-  const telegramBotUrl = `https://t.me/${telegramBotUsername}`;
-
   return (
     <div className={clsx("p-6", className)}>
       <Stack gap="xl">
-        <Button
+        {/* <Button
           variant="subtle"
           leftSection={<IconArrowLeft size={16} />}
           onClick={() => navigate(ROUTES.publicTournaments)}
@@ -110,20 +102,10 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
           style={{ alignSelf: "flex-start" }}
         >
           Назад
-        </Button>
+        </Button> */}
         <Group justify="space-between" align="flex-start">
           <Title size="h1">{tournament.name}</Title>
           <Group gap="md">
-            <Button
-              component="a"
-              href={telegramBotUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              leftSection={<IconSend size={16} />}
-              color="blue"
-            >
-              Подать заявку
-            </Button>
             <Badge
               color={statusColors[tournament.status]}
               variant="light"

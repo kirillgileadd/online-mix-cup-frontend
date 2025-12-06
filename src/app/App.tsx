@@ -1,11 +1,14 @@
 import { Outlet } from "react-router-dom";
+import { LoadingScreen } from "./LoadingScreen";
 
 export function App() {
   return (
-    <div className="min-h-screen ">
-      <main className="pb-6">
-        <Outlet />
-      </main>
-    </div>
+    <LoadingScreen>
+      <div className="min-h-screen">
+        <main className="pb-6">
+          <Outlet />
+        </main>
+      </div>
+    </LoadingScreen>
   );
 }

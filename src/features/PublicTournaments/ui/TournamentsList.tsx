@@ -10,7 +10,7 @@ import {
   Button,
   Image,
 } from "@mantine/core";
-import { IconSettings } from "@tabler/icons-react";
+import { IconSend, IconSettings } from "@tabler/icons-react";
 import clsx from "clsx";
 import { type FC } from "react";
 import { useGetPublicTournaments } from "../model/useGetPublicTournaments";
@@ -41,6 +41,10 @@ const statusColors: Record<TournamentStatus, string> = {
 export const TournamentsList: FC<TournamentsListProps> = ({ className }) => {
   const tournamentsQuery = useGetPublicTournaments();
 
+  const telegramBotUsername =
+    import.meta.env.VITE_TELEGRAM_BOT_USERNAME || "mixifycup_bot";
+  const telegramBotUrl = `https://t.me/${telegramBotUsername}`;
+
   if (tournamentsQuery.isLoading) {
     return (
       <Center className={clsx("py-12", className)}>
@@ -63,50 +67,53 @@ export const TournamentsList: FC<TournamentsListProps> = ({ className }) => {
     <div className={clsx("", className)}>
       <div className="flex justify-between items-center mb-8">
         <Title size="h1">Турниры</Title>
-        <AppCan action={(permissions) => permissions.users.canManage()}>
+        <div className="flex items-center flex-wrap gap-2">
           <Button
-            component={Link}
-            to={ROUTES.adminUsers}
-            leftSection={<IconSettings size={16} />}
+            component="a"
+            href={telegramBotUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            leftSection={<IconSend size={16} />}
+            color="blue"
             variant="light"
           >
-            Админка
+            Подать заявку
           </Button>
-        </AppCan>
+          <AppCan action={(permissions) => permissions.users.canManage()}>
+            <Button
+              component={Link}
+              to={ROUTES.adminUsers}
+              leftSection={<IconSettings size={16} />}
+              variant="light"
+            >
+              Админка
+            </Button>
+          </AppCan>
+        </div>
       </div>
       {tournaments.length === 0 ? (
         <Text c="dimmed">Турниры не найдены</Text>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {tournaments.map((tournament) => (
             <Card
               key={tournament.id}
               component={Link}
               to={ROUTES.publicTournament(tournament.id)}
               shadow="sm"
-              padding="lg"
+              padding="md"
               radius="md"
               withBorder
-              className="hover:shadow-md transition-shadow cursor-pointer"
+              className="hover:shadow-md hover:scale-[1.02] transition-all duration-300 cursor-pointer"
             >
               <Stack gap="md">
                 {tournament?.previewUrl && (
-                  <div
-                    style={{
-                      height: 200,
-                      overflow: "hidden",
-                      borderRadius: "var(--mantine-radius-md)",
-                    }}
-                  >
+                  <div className="aspect-square overflow-hidden rounded-md">
                     <Image
                       src={tournament.previewUrl}
                       alt={tournament.name}
                       fit="cover"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
+                      className="w-full h-full object-cover"
                     />
                   </div>
                 )}
