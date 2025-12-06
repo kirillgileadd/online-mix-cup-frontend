@@ -6,8 +6,9 @@ import {
   IconPray,
   IconEdit,
   IconSettings,
+  IconTrash,
 } from "@tabler/icons-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ROUTES } from "../../../shared/routes";
 import { MantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
 import { type FC, useMemo } from "react";
@@ -15,6 +16,7 @@ import { useGetTournaments } from "../model/useGetTournaments";
 import { useCreateTournamentModal } from "./useCreateTournamentModal";
 import { useUpdateTournamentModal } from "./useUpdateTournamentModal";
 import { useUpdateTournament } from "../model/useUpdateTournament";
+import { useDeleteTournament } from "../model/useDeleteTournament";
 import { startTournament } from "../../../shared/api/tournaments";
 import { useReactTable } from "../../../shared/useReactTable";
 import type {
@@ -48,6 +50,7 @@ export const TournamentsTable: FC<TournamentsTableProps> = ({ className }) => {
   const createModal = useCreateTournamentModal();
   const updateModal = useUpdateTournamentModal();
   const updateMutation = useUpdateTournament();
+  const deleteMutation = useDeleteTournament();
   const queryClient = useQueryClient();
 
   const tournamentsQuery = useGetTournaments();
@@ -92,6 +95,23 @@ export const TournamentsTable: FC<TournamentsTableProps> = ({ className }) => {
     });
   };
 
+  const handleDeleteTournament = (tournament: Tournament) => {
+    modals.openConfirmModal({
+      title: "Удалить турнир",
+      children: (
+        <div>
+          Вы уверены, что хотите удалить турнир{" "}
+          <strong>{tournament.name}</strong>? Это действие нельзя отменить.
+        </div>
+      ),
+      labels: { confirm: "Удалить", cancel: "Отмена" },
+      confirmProps: { color: "red" },
+      onConfirm: () => {
+        deleteMutation.mutate(tournament.id);
+      },
+    });
+  };
+
   const columns = useMemo<MRT_ColumnDef<Tournament>[]>(
     () => [
       {
@@ -99,6 +119,14 @@ export const TournamentsTable: FC<TournamentsTableProps> = ({ className }) => {
         header: "Название",
         sortingFn: "alphanumeric",
         filterFn: "contains",
+        Cell: ({ cell }) => (
+          <Link
+            className="hover:text-blue-500"
+            to={ROUTES.adminTournament(cell.row.original.id)}
+          >
+            <p>{cell.getValue() as string}</p>
+          </Link>
+        ),
       },
       {
         accessorKey: "status",
@@ -204,6 +232,14 @@ export const TournamentsTable: FC<TournamentsTableProps> = ({ className }) => {
             disabled={row.original.status !== "collecting"}
           >
             Запустить турнир
+          </Menu.Item>
+          <Menu.Divider />
+          <Menu.Item
+            leftSection={<IconTrash size={16} />}
+            onClick={() => handleDeleteTournament(row.original)}
+            color="red"
+          >
+            Удалить турнир
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>

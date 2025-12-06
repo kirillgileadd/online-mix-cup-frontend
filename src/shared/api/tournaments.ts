@@ -98,3 +98,14 @@ export const startTournament = async (
   );
   return response.data;
 };
+
+export type DeleteTournamentResponse = Tournament;
+
+export const deleteTournament = async (
+  tournamentId: number
+): Promise<DeleteTournamentResponse> => {
+  const response = await authorizedApiClient.delete<DeleteTournamentResponse>(
+    `/tournaments/${tournamentId}`
+  );
+  return response.data;
+};

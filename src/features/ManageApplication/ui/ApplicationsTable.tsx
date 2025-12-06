@@ -1,12 +1,13 @@
 import { ActionIcon, Menu, Title, Badge, Select, Image } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import clsx from "clsx";
-import { IconDots, IconCheck, IconX } from "@tabler/icons-react";
+import { IconDots, IconCheck, IconX, IconTrash } from "@tabler/icons-react";
 import { MantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
 import { type FC, useMemo, useState } from "react";
 import { useGetPendingApplications } from "../model/useGetPendingApplications";
 import { useApproveApplication } from "../model/useApproveApplication";
 import { useRejectApplication } from "../model/useRejectApplication";
+import { useDeleteApplication } from "../model/useDeleteApplication";
 import { useReactTable } from "@/shared/useReactTable";
 import type { Application, ApplicationStatus } from "@/entitity/Application";
 import { useGetTournaments } from "../../ManageTournament/model/useGetTournaments";
@@ -29,6 +30,7 @@ export const ApplicationsTable: FC<ApplicationsTableProps> = ({
   );
   const approveMutation = useApproveApplication();
   const rejectMutation = useRejectApplication();
+  const deleteMutation = useDeleteApplication();
   const applicationsQuery = useGetPendingApplications(
     tournamentId ? { tournamentId } : undefined
   );
@@ -79,6 +81,26 @@ export const ApplicationsTable: FC<ApplicationsTableProps> = ({
       confirmProps: { color: "red" },
       onConfirm: () => {
         rejectMutation.mutate(application.id);
+      },
+    });
+  };
+
+  const handleDelete = (application: Application) => {
+    modals.openConfirmModal({
+      title: "Удалить заявку",
+      children: (
+        <div>
+          Вы уверены, что хотите удалить заявку от{" "}
+          <strong>
+            {application.user?.username || application.user?.telegramId}
+          </strong>
+          ? Это действие нельзя отменить.
+        </div>
+      ),
+      labels: { confirm: "Удалить", cancel: "Отмена" },
+      confirmProps: { color: "red" },
+      onConfirm: () => {
+        deleteMutation.mutate(application.id);
       },
     });
   };
@@ -234,6 +256,14 @@ export const ApplicationsTable: FC<ApplicationsTableProps> = ({
             color="red"
           >
             Отклонить
+          </Menu.Item>
+          <Menu.Divider />
+          <Menu.Item
+            leftSection={<IconTrash size={16} />}
+            onClick={() => handleDelete(row.original)}
+            color="red"
+          >
+            Удалить заявку
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>

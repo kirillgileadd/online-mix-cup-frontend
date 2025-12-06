@@ -9,6 +9,7 @@ export interface GetPendingApplicationsParams {
 
 export type ApproveApplicationResponse = Application;
 export type RejectApplicationResponse = Application;
+export type DeleteApplicationResponse = Application;
 
 export const getPendingApplications = async (
   params?: GetPendingApplicationsParams
@@ -37,6 +38,15 @@ export const rejectApplication = async (
 ): Promise<RejectApplicationResponse> => {
   const response = await authorizedApiClient.post<RejectApplicationResponse>(
     `/applications/${applicationId}/reject`
+  );
+  return response.data;
+};
+
+export const deleteApplication = async (
+  applicationId: number
+): Promise<DeleteApplicationResponse> => {
+  const response = await authorizedApiClient.delete<DeleteApplicationResponse>(
+    `/applications/${applicationId}`
   );
   return response.data;
 };
