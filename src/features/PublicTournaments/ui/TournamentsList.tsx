@@ -93,6 +93,78 @@ export const TournamentsList: FC<TournamentsListProps> = ({ className }) => {
       </div>
       {tournaments.length === 0 ? (
         <Text c="dimmed">Турниры не найдены</Text>
+      ) : tournaments.length === 1 ? (
+        <div className="flex justify-center">
+          <div className="w-full max-w-md">
+            {tournaments[0] && (
+              <Card
+                key={tournaments[0].id}
+                component={Link}
+                to={ROUTES.publicTournament(tournaments[0].id)}
+                shadow="sm"
+                padding="lg"
+                radius="md"
+                withBorder
+                className="hover:shadow-md hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+              >
+                <Stack gap="md">
+                  {tournaments[0]?.previewUrl && (
+                    <div className="aspect-square overflow-hidden rounded-md">
+                      <Image
+                        src={tournaments[0].previewUrl}
+                        alt={tournaments[0].name}
+                        fit="cover"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <Group justify="space-between" align="flex-start">
+                    <Title order={2} lineClamp={2}>
+                      {tournaments[0].name}
+                    </Title>
+                    <Badge
+                      color={statusColors[tournaments[0].status]}
+                      variant="light"
+                      size="lg"
+                    >
+                      {statusLabels[tournaments[0].status]}
+                    </Badge>
+                  </Group>
+
+                  {tournaments[0].eventDate && (
+                    <Text size="md" c="dimmed">
+                      Дата:{" "}
+                      {dayjs(tournaments[0].eventDate).format(
+                        "DD.MM.YYYY HH:mm"
+                      )}
+                    </Text>
+                  )}
+
+                  <Group gap="xl">
+                    <div>
+                      <Text size="sm" c="dimmed">
+                        Взнос
+                      </Text>
+                      <Text fw={500} size="lg">
+                        {tournaments[0].price} ₽
+                      </Text>
+                    </div>
+                    {tournaments[0].prizePool && (
+                      <div>
+                        <Text size="sm" c="dimmed">
+                          Призовой фонд
+                        </Text>
+                        <Text fw={500} size="lg">
+                          {tournaments[0].prizePool} ₽
+                        </Text>
+                      </div>
+                    )}
+                  </Group>
+                </Stack>
+              </Card>
+            )}
+          </div>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {tournaments.map((tournament) => (
