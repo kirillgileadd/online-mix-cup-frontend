@@ -8,6 +8,7 @@ export interface CreateTournamentRequest {
   eventDate?: string | null;
   price: number;
   prizePool?: number | null;
+  previewImageBase64?: string | null;
 }
 
 export type CreateTournamentResponse = Tournament;
@@ -18,6 +19,7 @@ export interface UpdateTournamentRequest {
   eventDate?: string | null;
   price?: number;
   prizePool?: number | null;
+  previewImageBase64?: string | null;
 }
 
 export interface UpdateTournamentStatusRequest {
@@ -72,7 +74,7 @@ export const updateTournament = async (
   data: UpdateTournamentRequest
 ): Promise<Tournament> => {
   const { tournamentId, ...updateData } = data;
-  const response = await authorizedApiClient.put<Tournament>(
+  const response = await authorizedApiClient.patch<Tournament>(
     `/tournaments/${tournamentId}`,
     updateData
   );

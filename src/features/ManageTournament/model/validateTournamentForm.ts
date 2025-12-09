@@ -1,24 +1,26 @@
 import type { TournamentFormValues } from "./types";
+import { fileToBase64 } from "../../../shared/utils/fileToBase64";
 
 /**
  * Очищает значения формы от пустых строк и обрезает пробелы.
+ * Конвертирует File в base64 строку.
  * Возвращает объект только с заполненными полями.
  */
-export const validateTournamentForm = (
+export const validateTournamentForm = async (
   tournamentData: TournamentFormValues
-): {
+): Promise<{
   name: string;
   eventDate?: string | null;
   price: number;
   prizePool?: number | null;
-  previewUrl?: string | null;
-} => {
+  previewImageBase64?: string | null;
+}> => {
   const result: {
     name: string;
     eventDate?: string | null;
     price: number;
     prizePool?: number | null;
-    previewUrl?: string | null;
+    previewImageBase64?: string | null;
   } = {
     name: tournamentData.name.trim(),
     price: tournamentData.price,
@@ -37,11 +39,10 @@ export const validateTournamentForm = (
     result.prizePool = tournamentData.prizePool;
   }
   if (
-    tournamentData.previewUrl !== undefined &&
-    tournamentData.previewUrl !== null &&
-    tournamentData.previewUrl.trim() !== ""
+    tournamentData.previewImageBase64 !== undefined &&
+    tournamentData.previewImageBase64 !== null
   ) {
-    result.previewUrl = tournamentData.previewUrl.trim();
+    result.previewImageBase64 = await fileToBase64(tournamentData.previewImageBase64);
   }
 
   return result;

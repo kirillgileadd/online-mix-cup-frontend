@@ -27,7 +27,7 @@ export const UpdateTournamentModal: FC<UpdateTournamentModalProps> = ({
     setError: UseFormSetError<TournamentFormValues>
   ) => {
     try {
-      const validatedData = validateTournamentForm(tournamentData);
+      const validatedData = await validateTournamentForm(tournamentData);
       const requestData = {
         tournamentId: tournamentId,
         ...validatedData,

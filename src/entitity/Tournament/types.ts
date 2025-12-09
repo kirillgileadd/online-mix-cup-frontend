@@ -9,4 +9,6 @@ export interface Tournament {
   prizePool: number | null;
   previewUrl?: string | null;
   createdAt: string;
+  approvedApplicationsCount?: number | null;
+  calculatedPrizePool?: number | null;
 }

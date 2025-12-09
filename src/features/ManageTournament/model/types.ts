@@ -3,6 +3,5 @@ export type TournamentFormValues = {
   eventDate?: string | null;
   price: number;
   prizePool?: number | null;
-  previewUrl?: string | null;
+  previewImageBase64?: File | null;
 };
-

@@ -6,4 +6,7 @@ export { useDraftPick } from "./useDraftPick";
 export { useStartPlaying } from "./useStartPlaying";
 export { useFinishLobby } from "./useFinishLobby";
 export { useReplacePlayer } from "./useReplacePlayer";
+export { useGetCurrentPicker } from "./useGetCurrentPicker";
+export { useSetFirstPicker } from "./useSetFirstPicker";
+export { isTeamFull } from "./teamUtils";
 

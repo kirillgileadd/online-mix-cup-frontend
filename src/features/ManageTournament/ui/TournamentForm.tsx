@@ -6,6 +6,7 @@ import {
   Text,
   TextInput,
   NumberInput,
+  FileInput,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import clsx from "clsx";
@@ -43,7 +44,7 @@ export const TournamentForm: FC<TournamentFormProps> = ({
       eventDate: tournament.eventDate,
       price: tournament.price,
       prizePool: tournament.prizePool,
-      previewUrl: tournament.previewUrl,
+      previewImageBase64: null, // Файл нельзя восстановить из URL, поэтому null
     };
   }, [tournamentQuery.data, tournamentId]);
 
@@ -59,7 +60,7 @@ export const TournamentForm: FC<TournamentFormProps> = ({
       eventDate: null,
       price: 0,
       prizePool: null,
-      previewUrl: null,
+      previewImageBase64: null,
     },
     values: formValues,
   });
@@ -137,11 +138,19 @@ export const TournamentForm: FC<TournamentFormProps> = ({
               />
             )}
           />
-          <TextInput
-            label="URL превью изображения"
-            placeholder="Введите URL изображения (необязательно)"
-            {...register("previewUrl")}
-            error={errors.previewUrl?.message}
+          <Controller
+            name="previewImageBase64"
+            control={control}
+            render={({ field }) => (
+              <FileInput
+                label="Превью изображение"
+                placeholder="Выберите изображение (необязательно)"
+                accept="image/*"
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.previewImageBase64?.message}
+              />
+            )}
           />
           <Button type="submit">{tournamentId ? "Обновить" : "Создать"}</Button>
         </Flex>

@@ -24,7 +24,7 @@ export const CreateTournamentModal: FC<CreateTournamentModalProps> = ({
     setError: UseFormSetError<TournamentFormValues>
   ) => {
     try {
-      const requestData = validateTournamentForm(tournamentData);
+      const requestData = await validateTournamentForm(tournamentData);
       const response = await createMutation.mutateAsync(requestData);
       onClose(response);
     } catch (error) {

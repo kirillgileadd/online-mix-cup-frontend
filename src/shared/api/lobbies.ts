@@ -7,12 +7,13 @@ export type ParticipationResult = "WIN" | "LOSS" | "NONE";
 export interface Participation {
   id: number;
   lobbyId: number;
-  tournamentPlayerId?: number | null;
+  teamId?: number | null;
   playerId: number;
-  team?: number | null;
+  slot?: number | null;
   isCaptain: boolean;
   pickedAt?: string | null;
   result?: ParticipationResult | null;
+  updatedAt?: string;
   player?: {
     id: number;
     nickname?: string;
@@ -20,7 +21,21 @@ export interface Participation {
     mmr: number;
     lives: number;
     gameRoles?: string | null;
-  };
+    user?: {
+      id: number;
+      telegramId: string;
+      username?: string | null;
+      discordUsername?: string | null;
+    } | null;
+  } | null;
+}
+
+export interface Team {
+  id: number;
+  lobbyId: number;
+  discordChannelId?: string | null;
+  createdAt: string;
+  participations?: Participation[];
 }
 
 export interface Lobby {
@@ -28,8 +43,12 @@ export interface Lobby {
   round: number;
   status: LobbyStatus;
   tournamentId?: number | null;
+  lotteryWinnerId?: number | null; // ID капитана-победителя жребия
+  firstPickerId?: number | null; // ID капитана, который выбирает первым
   createdAt: string;
+  updatedAt?: string;
   participations: Participation[];
+  teams: Team[];
 }
 
 export interface GenerateLobbiesRequest {
@@ -43,14 +62,16 @@ export type StartDraftResponse = Lobby;
 export interface DraftPickRequest {
   lobbyId: number;
   playerId: number | null;
-  team: number;
+  teamId: number;
+  slot: number;
+  type: "add" | "remove";
 }
 
 export type DraftPickResponse = Lobby;
 
 export interface FinishLobbyRequest {
   lobbyId: number;
-  winningTeam: number;
+  winningTeamId: number; // teamId команды-победителя
 }
 
 export type FinishLobbyResponse = Lobby;
@@ -169,5 +190,35 @@ export const longPollLobbies = async (
   if (response.status === 204) {
     return null;
   }
+  return response.data;
+};
+
+export interface GetCurrentPickerResponse {
+  currentPickerId: number | null;
+}
+
+export const getCurrentPicker = async (
+  lobbyId: number
+): Promise<GetCurrentPickerResponse> => {
+  const response = await authorizedApiClient.get<GetCurrentPickerResponse>(
+    `/lobbies/${lobbyId}/current-picker`
+  );
+  return response.data;
+};
+
+export interface SetFirstPickerRequest {
+  lobbyId: number;
+  firstPickerId: number;
+}
+
+export type SetFirstPickerResponse = Lobby;
+
+export const setFirstPicker = async (
+  data: SetFirstPickerRequest
+): Promise<SetFirstPickerResponse> => {
+  const response = await authorizedApiClient.post<SetFirstPickerResponse>(
+    `/lobbies/${data.lobbyId}/set-first-picker`,
+    { firstPickerId: data.firstPickerId }
+  );
   return response.data;
 };

@@ -25,7 +25,7 @@ export const PublicTournamentsPage: FC<PublicTournamentsPageProps> = ({
         </picture>
         <div className="absolute top-0 left-0 w-full h-full bg-black/70 z-0 pointer-events-none" />
       </div>
-      <div className="p-6 relative z-10">
+      <div>
         <TournamentsList />
       </div>
     </div>

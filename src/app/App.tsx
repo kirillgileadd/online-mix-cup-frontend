@@ -5,7 +5,7 @@ export function App() {
   return (
     <LoadingScreen>
       <div className="min-h-screen">
-        <main className="pb-6">
+        <main className="py-6">
           <Outlet />
         </main>
       </div>

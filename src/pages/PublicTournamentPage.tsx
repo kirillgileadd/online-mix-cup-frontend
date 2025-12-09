@@ -7,6 +7,7 @@ import {
   Loader,
   Center,
   Tabs,
+  Container,
 } from "@mantine/core";
 import clsx from "clsx";
 import { type FC, useMemo, useState } from "react";
@@ -92,7 +93,7 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
     .sort((a, b) => a - b);
 
   return (
-    <div className={clsx("p-6", className)}>
+    <Container size="xl" className={clsx("", className)}>
       <Stack gap="xl">
         {/* <Button
           variant="subtle"
@@ -189,6 +190,6 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
           </Tabs.Panel>
         </Tabs>
       </Stack>
-    </div>
+    </Container>
   );
 };

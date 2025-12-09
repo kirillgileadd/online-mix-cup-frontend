@@ -9,6 +9,7 @@ import {
   Center,
   Button,
   Image,
+  Container,
 } from "@mantine/core";
 import { IconSend, IconSettings } from "@tabler/icons-react";
 import clsx from "clsx";
@@ -64,7 +65,7 @@ export const TournamentsList: FC<TournamentsListProps> = ({ className }) => {
   const tournaments = tournamentsQuery.data || [];
 
   return (
-    <div className={clsx("", className)}>
+    <Container size="xl" className={clsx("", className)}>
       <div className="flex justify-between items-center mb-8">
         <Title size="h1">Турниры</Title>
         <div className="flex items-center flex-wrap gap-2">
@@ -149,24 +150,45 @@ export const TournamentsList: FC<TournamentsListProps> = ({ className }) => {
                         {tournaments[0].price} ₽
                       </Text>
                     </div>
-                    {tournaments[0].prizePool && (
+                    {!!tournaments[0].calculatedPrizePool ? (
                       <div>
                         <Text size="sm" c="dimmed">
                           Призовой фонд
                         </Text>
                         <Text fw={500} size="lg">
-                          {tournaments[0].prizePool} ₽
+                          {tournaments[0].calculatedPrizePool} ₽
                         </Text>
                       </div>
+                    ) : (
+                      tournaments[0].prizePool && (
+                        <div>
+                          <Text size="sm" c="dimmed">
+                            Призовой фонд
+                          </Text>
+                          <Text fw={500} size="lg">
+                            {tournaments[0].prizePool} ₽
+                          </Text>
+                        </div>
+                      )
                     )}
                   </Group>
+                  {!!tournaments[0].approvedApplicationsCount && (
+                    <div>
+                      <Text size="sm" c="dimmed">
+                        Одобренных заявок
+                      </Text>
+                      <Text fw={500} size="lg">
+                        {tournaments[0].approvedApplicationsCount}
+                      </Text>
+                    </div>
+                  )}
                 </Stack>
               </Card>
             )}
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {tournaments.map((tournament) => (
             <Card
               key={tournament.id}
@@ -182,7 +204,7 @@ export const TournamentsList: FC<TournamentsListProps> = ({ className }) => {
                 {tournament?.previewUrl && (
                   <div className="aspect-square overflow-hidden rounded-md">
                     <Image
-                      src={tournament.previewUrl}
+                      src={`${import.meta.env.VITE_ENVOY_API_URL}${tournament.previewUrl}`}
                       alt={tournament.name}
                       fit="cover"
                       className="w-full h-full object-cover"
@@ -215,20 +237,37 @@ export const TournamentsList: FC<TournamentsListProps> = ({ className }) => {
                     </Text>
                     <Text fw={500}>{tournament.price} ₽</Text>
                   </div>
-                  {tournament.prizePool && (
+                  {!!tournament.calculatedPrizePool ? (
                     <div>
                       <Text size="xs" c="dimmed">
                         Призовой фонд
                       </Text>
-                      <Text fw={500}>{tournament.prizePool} ₽</Text>
+                      <Text fw={500}>{tournament.calculatedPrizePool} ₽</Text>
                     </div>
+                  ) : (
+                    tournament.prizePool && (
+                      <div>
+                        <Text size="xs" c="dimmed">
+                          Призовой фонд
+                        </Text>
+                        <Text fw={500}>{tournament.prizePool} ₽</Text>
+                      </div>
+                    )
                   )}
                 </Group>
+                {!!tournament.approvedApplicationsCount && (
+                  <div>
+                    <Text size="xs" c="dimmed">
+                      Одобренных заявок
+                    </Text>
+                    <Text fw={500}>{tournament.approvedApplicationsCount}</Text>
+                  </div>
+                )}
               </Stack>
             </Card>
           ))}
         </div>
       )}
-    </div>
+    </Container>
   );
 };

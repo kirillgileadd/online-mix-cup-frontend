@@ -29,8 +29,16 @@ export const RoundSection: FC<RoundSectionProps> = ({
   const { data: chillZonePlayers = [], isLoading: chillZoneLoading } =
     useGetChillZonePlayers(tournamentId, round);
 
+  // Проверяем, все ли лобби завершены
+  const allLobbiesFinished =
+    lobbies.length > 0 && lobbies.every((lobby) => lobby.status === "FINISHED");
+
+  const accordionProps = allLobbiesFinished
+    ? { variant: "separated" as const }
+    : { variant: "separated" as const, defaultValue: `round-${round}` };
+
   return (
-    <Accordion variant="separated" defaultValue={`round-${round}`}>
+    <Accordion {...accordionProps}>
       <Accordion.Item value={`round-${round}`}>
         <Accordion.Control>
           <Group justify="space-between" w="100%">
