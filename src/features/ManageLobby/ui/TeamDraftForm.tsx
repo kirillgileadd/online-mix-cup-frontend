@@ -174,6 +174,7 @@ export const TeamDraftForm: FC<TeamDraftFormProps> = ({
                     disabled ||
                     (draftPickMutation.isPending &&
                       draftPickMutation.variables.playerId === value)
+                      
                   }
                   clearable={!readonly && !disabled}
                   disabled={disabled}

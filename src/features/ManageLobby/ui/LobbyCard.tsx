@@ -401,8 +401,7 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
                   team={team1}
                   participations={lobby.participations}
                   unassignedPlayers={unassigned}
-                  readonly={readonly}
-                  disabled={lobby.status !== "DRAFTING"}
+                  readonly={readonly || lobby.status !== "DRAFTING"}
                 />
               )}
             </div>
@@ -421,8 +420,7 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
                   team={team2}
                   participations={lobby.participations}
                   unassignedPlayers={unassigned}
-                  readonly={readonly}
-                  disabled={lobby.status !== "DRAFTING"}
+                  readonly={readonly || lobby.status !== "DRAFTING"}
                 />
               )}
             </div>
