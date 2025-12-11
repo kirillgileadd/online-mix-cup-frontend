@@ -21,7 +21,7 @@ export function Header() {
   if (!session) return;
 
   return (
-    <header className="bg-dark-400 shadow">
+    <header className="bg-dark-800 border-b border-dark-600 shadow">
       <div className="mx-auto px-4 sm:px-6">
         <div className="flex justify-between h-16">
           <div className="flex items-center gap-10">

@@ -14,6 +14,7 @@ import { router } from "./app/router";
 import { AppPermissionsProvider } from "./shared/authorization.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ErrorBoundary } from "./app/ErrorBoundary.tsx";
+import { theme } from "./shared/theme";
 
 const queryClient = new QueryClient();
 
@@ -21,7 +22,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <MantineProvider defaultColorScheme="dark">
+        <MantineProvider theme={theme} defaultColorScheme="dark">
           <ModalsProvider>
             <AppPermissionsProvider>
               <Notifications />

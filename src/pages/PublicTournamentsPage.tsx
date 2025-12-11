@@ -10,7 +10,7 @@ export const PublicTournamentsPage: FC<PublicTournamentsPageProps> = ({
   className,
 }) => {
   return (
-    <div className={clsx("", className)}>
+    <div className={clsx("py-6", className)}>
       <div className="fixed top-0 left-0 w-screen h-screen -z-10 pointer-events-none">
         <picture className="absolute inset-0 w-full h-full">
           <source

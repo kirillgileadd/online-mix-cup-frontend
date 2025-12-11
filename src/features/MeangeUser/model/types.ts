@@ -3,5 +3,6 @@ export type UserFormValues = {
   username?: string;
   photoUrl?: string;
   discordUsername?: string;
+  steamProfileLink?: string;
   roles: string[];
 };

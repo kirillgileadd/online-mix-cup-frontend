@@ -23,6 +23,7 @@ export function useReactTable<TData extends MRT_RowData>(
     enableColumnDragging: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
+    renderTopToolbar: false,
     enableHiding: false,
     filterFromLeafRows: false,
     enableTopToolbar: false,
@@ -40,7 +41,7 @@ export function useReactTable<TData extends MRT_RowData>(
     },
     initialState: {
       ...tableOptions.initialState,
-      density: "xs",
+      density: "md",
       pagination: { pageSize: 50, pageIndex: 0 },
     },
     displayColumnDefOptions: {

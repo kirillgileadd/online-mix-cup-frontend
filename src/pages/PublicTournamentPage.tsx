@@ -93,103 +93,128 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
     .sort((a, b) => a - b);
 
   return (
-    <Container size="xl" className={clsx("", className)}>
-      <Stack gap="xl">
-        {/* <Button
-          variant="subtle"
-          leftSection={<IconArrowLeft size={16} />}
-          onClick={() => navigate(ROUTES.publicTournaments)}
-          mb="md"
-          style={{ alignSelf: "flex-start" }}
-        >
-          Назад
-        </Button> */}
-        <Group justify="space-between" align="flex-start">
-          <Title size="h1">{tournament.name}</Title>
-          <Group gap="md">
-            <Badge
-              color={statusColors[tournament.status]}
-              variant="light"
-              size="lg"
-            >
-              {statusLabels[tournament.status]}
-            </Badge>
+    <div className={clsx("min-h-screen h-full flex flex-col pt-6", className)}>
+      <Container className="w-full" size="xl">
+        <Stack className="mb-4" gap="xl">
+          <Group justify="space-between" align="flex-start">
+            <Title size="h1">{tournament.name}</Title>
+            <Group gap="md">
+              <Badge
+                color={statusColors[tournament.status]}
+                variant="light"
+                size="lg"
+              >
+                {statusLabels[tournament.status]}
+              </Badge>
+            </Group>
           </Group>
-        </Group>
 
-        <Group gap="xl">
-          {tournament.eventDate && (
+          <Group gap="xl">
+            {tournament.eventDate && (
+              <div>
+                <Text size="sm" c="dimmed">
+                  Дата проведения
+                </Text>
+                <Text fw={500}>
+                  {new Date(tournament.eventDate).toLocaleDateString("ru-RU", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </Text>
+              </div>
+            )}
             <div>
               <Text size="sm" c="dimmed">
-                Дата проведения
+                Взнос
               </Text>
-              <Text fw={500}>
-                {new Date(tournament.eventDate).toLocaleDateString("ru-RU", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </Text>
+              <Text fw={500}>{tournament.price} ₽</Text>
             </div>
-          )}
-          <div>
-            <Text size="sm" c="dimmed">
-              Взнос
-            </Text>
-            <Text fw={500}>{tournament.price} ₽</Text>
-          </div>
-          {tournament.prizePool && (
-            <div>
-              <Text size="sm" c="dimmed">
-                Призовой фонд
-              </Text>
-              <Text fw={500}>{tournament.prizePool} ₽</Text>
-            </div>
-          )}
-        </Group>
+            {tournament.prizePool && (
+              <div>
+                <Text size="sm" c="dimmed">
+                  Призовой фонд
+                </Text>
+                <Text fw={500}>{tournament.prizePool} ₽</Text>
+              </div>
+            )}
+          </Group>
+        </Stack>
+      </Container>
+      <Tabs
+        className="grow flex! flex-col!"
+        value={activeTab}
+        onChange={handleTabChange}
+      >
+        <Tabs.List className="before:[--tab-border-color:var(--color-dark-600)]">
+          <Container
+            className="flex items-start justify-start w-full "
+            size="xl"
+          >
+            <Tabs.Tab
+              classNames={{
+                tab: "px-4! py-3! hover:text-primary",
+              }}
+              value="applications"
+            >
+              Заявки
+            </Tabs.Tab>
+            <Tabs.Tab
+              classNames={{
+                tab: "px-4! py-3! hover:text-primary",
+              }}
+              value="players"
+            >
+              Игроки
+            </Tabs.Tab>
+            <Tabs.Tab
+              classNames={{
+                tab: "px-4! py-3! hover:text-primary",
+              }}
+              value="rounds"
+            >
+              Раунды
+            </Tabs.Tab>
+          </Container>
+        </Tabs.List>
+        <div className="bg-dark-800 grow pb-6">
+          <Container size="xl">
+            <Tabs.Panel value="applications" pt="lg">
+              <TournamentApplicationsTable tournamentId={tournamentId} />
+            </Tabs.Panel>
 
-        <Tabs value={activeTab} onChange={handleTabChange}>
-          <Tabs.List>
-            <Tabs.Tab value="applications">Заявки</Tabs.Tab>
-            <Tabs.Tab value="players">Игроки</Tabs.Tab>
-            <Tabs.Tab value="rounds">Раунды</Tabs.Tab>
-          </Tabs.List>
+            <Tabs.Panel value="players" pt="lg">
+              <TournamentPlayersTable
+                tournamentId={tournamentId}
+                refreshToken={playersRefreshToken}
+              />
+            </Tabs.Panel>
 
-          <Tabs.Panel value="applications" pt="lg">
-            <TournamentApplicationsTable tournamentId={tournamentId} />
-          </Tabs.Panel>
-
-          <Tabs.Panel value="players" pt="lg">
-            <TournamentPlayersTable
-              tournamentId={tournamentId}
-              refreshToken={playersRefreshToken}
-            />
-          </Tabs.Panel>
-
-          <Tabs.Panel value="rounds" pt="lg">
-            <Stack gap="md">
-              <Title order={2}>Раунды</Title>
-              {lobbiesLoading ? (
-                <Center py="xl">
-                  <Loader />
-                </Center>
-              ) : roundNumbers.length === 0 ? (
-                <Text c="dimmed">Лобби еще не были сгенерированы.</Text>
-              ) : (
-                roundNumbers.map((round) => (
-                  <RoundSection
-                    key={round}
-                    round={round}
-                    lobbies={lobbiesByRound[round] ?? []}
-                    tournamentId={tournamentId}
-                    readonly
-                  />
-                ))
-              )}
-            </Stack>
-          </Tabs.Panel>
-        </Tabs>
-      </Stack>
-    </Container>
+            <Tabs.Panel value="rounds" pt="lg">
+              <Stack gap="md">
+                <Title order={2}>Раунды</Title>
+                {lobbiesLoading ? (
+                  <Center py="xl">
+                    <Loader />
+                  </Center>
+                ) : roundNumbers.length === 0 ? (
+                  <Text c="dimmed">Лобби еще не были сгенерированы.</Text>
+                ) : (
+                  roundNumbers.map((round) => (
+                    <RoundSection
+                      key={round}
+                      round={round}
+                      lobbies={lobbiesByRound[round] ?? []}
+                      tournamentId={tournamentId}
+                      readonly
+                    />
+                  ))
+                )}
+              </Stack>
+            </Tabs.Panel>
+          </Container>
+        </div>
+      </Tabs>
+    </div>
   );
 };

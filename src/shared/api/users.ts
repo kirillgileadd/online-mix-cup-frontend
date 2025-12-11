@@ -10,6 +10,7 @@ export interface CreateUserRequest {
   username?: string;
   photoUrl?: string;
   discordUsername?: string;
+  steamId64?: string;
   roles?: string[];
 }
 
@@ -22,6 +23,7 @@ export interface UpdateUserRequest {
   username?: string;
   photoUrl?: string;
   discordUsername?: string;
+  steamId64?: string;
   roles?: string[];
 }
 

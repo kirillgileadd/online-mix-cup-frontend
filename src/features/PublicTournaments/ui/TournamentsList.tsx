@@ -76,7 +76,6 @@ export const TournamentsList: FC<TournamentsListProps> = ({ className }) => {
             rel="noopener noreferrer"
             leftSection={<IconSend size={16} />}
             color="blue"
-            variant="light"
           >
             Подать заявку
           </Button>

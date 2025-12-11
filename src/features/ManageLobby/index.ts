@@ -9,5 +9,7 @@ export { useReplacePlayer } from "./model/useReplacePlayer";
 export { useGetChillZonePlayers } from "./model/useGetChillZonePlayers";
 export { useGetPublicLobbies } from "./model/useGetPublicLobbies";
 export { useTournamentLobbiesLongPoll } from "./model/useTournamentLobbiesLongPoll";
+export { useCreateSteamLobby } from "./model/useCreateSteamLobby";
+export { useLeaveSteamLobby } from "./model/useLeaveSteamLobby";
 
 export { LobbyCard, RoundSection } from "./ui";

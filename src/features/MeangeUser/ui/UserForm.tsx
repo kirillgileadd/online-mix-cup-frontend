@@ -52,6 +52,7 @@ export const UserForm: FC<UserFormProps> = ({
       username: user.username ?? "",
       photoUrl: user.photoUrl ?? "",
       discordUsername: user.discordUsername ?? "",
+      steamProfileLink: user.steamId64 ?? "",
       roles: user.roles ?? [],
     };
   }, [userQuery.data, userId]);
@@ -70,6 +71,7 @@ export const UserForm: FC<UserFormProps> = ({
       username: "",
       photoUrl: "",
       discordUsername: "",
+      steamProfileLink: "",
       roles: [],
     },
     values: formValues, // Используем values для автоматического обновления
@@ -130,6 +132,12 @@ export const UserForm: FC<UserFormProps> = ({
             placeholder="Введите Discord username"
             {...register("discordUsername")}
             error={errors.discordUsername?.message}
+          />
+          <TextInput
+            label="Steam Profile Link"
+            placeholder="Введите ссылку на Steam профиль"
+            {...register("steamProfileLink")}
+            error={errors.steamProfileLink?.message}
           />
           <Button type="submit">{userId ? "Обновить" : "Создать"}</Button>
         </Flex>

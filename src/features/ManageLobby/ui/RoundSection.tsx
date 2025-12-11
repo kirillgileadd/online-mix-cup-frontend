@@ -39,7 +39,7 @@ export const RoundSection: FC<RoundSectionProps> = ({
 
   return (
     <Accordion {...accordionProps}>
-      <Accordion.Item value={`round-${round}`}>
+      <Accordion.Item className="border-none!" value={`round-${round}`}>
         <Accordion.Control>
           <Group justify="space-between" w="100%">
             <Title order={3} m={0}>
@@ -49,10 +49,10 @@ export const RoundSection: FC<RoundSectionProps> = ({
         </Accordion.Control>
         <Accordion.Panel>
           <Stack gap="md">
-            <Card withBorder padding="md">
+            <Card padding="md">
               <Group justify="space-between" mb="sm">
                 <Title order={5}>Chill Zone</Title>
-                <Badge color="orange">
+                <Badge variant="light" color="red">
                   {chillZoneLoading ? "..." : chillZonePlayers.length}
                 </Badge>
               </Group>
@@ -64,7 +64,7 @@ export const RoundSection: FC<RoundSectionProps> = ({
                     <Group
                       key={player.id}
                       justify="space-between"
-                      className="rounded border border-dark-400 px-3 py-2 text-sm"
+                      className="rounded py-2 text-sm"
                     >
                       <Text fw={500}>{player.nickname}</Text>
                       <Text size="xs" c="dimmed">

@@ -8,5 +8,7 @@ export { useFinishLobby } from "./useFinishLobby";
 export { useReplacePlayer } from "./useReplacePlayer";
 export { useGetCurrentPicker } from "./useGetCurrentPicker";
 export { useSetFirstPicker } from "./useSetFirstPicker";
+export { useCreateSteamLobby } from "./useCreateSteamLobby";
+export { useLeaveSteamLobby } from "./useLeaveSteamLobby";
 export { isTeamFull } from "./teamUtils";
 

@@ -29,8 +29,6 @@ const arrangeIdsBySlot = (
 ): (number | null)[] => {
   const result: (number | null)[] = new Array(arrayLength).fill(null);
 
-  console.log(participations, "participations");
-
   participations.forEach((participation) => {
     if (participation.slot !== null && participation.slot !== undefined) {
       const index = participation.slot;
@@ -47,7 +45,6 @@ export const TeamDraftForm: FC<TeamDraftFormProps> = ({
   lobbyId,
   team,
   participations,
-  unassignedPlayers,
   readonly = false,
   disabled = false,
 }) => {
@@ -94,9 +91,7 @@ export const TeamDraftForm: FC<TeamDraftFormProps> = ({
   const buildPlayerOptions = () => {
     const options = participations.map((participant) => ({
       value: String(participant.playerId),
-      label: `${getPlayerName(participant)} (MMR: ${
-        participant.player?.mmr || 0
-      }, Жизни: ${participant.player?.lives ?? "-"})`,
+      label: getPlayerName(participant),
       disabled: teamForm?.some(
         (id) => id === participant.playerId || !!participant.teamId
       ),
@@ -110,13 +105,6 @@ export const TeamDraftForm: FC<TeamDraftFormProps> = ({
     });
   };
 
-  if (lobbyId === 173) {
-    console.log(watch(), "teamForm");
-    console.log(unassignedPlayers, "unassignedPlayers");
-    console.log(team, "team");
-    console.log(buildPlayerOptions(), "buildPlayerOptions");
-  }
-
   if (!team) {
     return (
       <Stack gap="xs" mt="sm">
@@ -128,8 +116,7 @@ export const TeamDraftForm: FC<TeamDraftFormProps> = ({
   }
 
   return (
-    <Stack gap="xs" mt="sm">
-      {/* 5 слотов для команды */}
+    <Stack gap="md" mt="sm">
       {[0, 1, 2, 3, 4].map((slotNum) => {
         return (
           <Controller
@@ -139,10 +126,10 @@ export const TeamDraftForm: FC<TeamDraftFormProps> = ({
               return (
                 <Select
                   key={`slot-${slotNum}`}
-                  label={slotNum === 0 ? "Капитан" : `Игрок ${slotNum + 1}`}
                   placeholder={
                     slotNum === 0 ? "Выберите капитана" : "Выберите игрока"
                   }
+                  size="lg"
                   searchable
                   data={buildPlayerOptions()}
                   value={value ? String(value) : null}
@@ -174,7 +161,6 @@ export const TeamDraftForm: FC<TeamDraftFormProps> = ({
                     disabled ||
                     (draftPickMutation.isPending &&
                       draftPickMutation.variables.playerId === value)
-                      
                   }
                   clearable={!readonly && !disabled}
                   disabled={disabled}
@@ -184,11 +170,6 @@ export const TeamDraftForm: FC<TeamDraftFormProps> = ({
           />
         );
       })}
-
-      {/* Счетчик */}
-      <Badge color="gray" variant="light" size="sm">
-        {teamForm?.length}/5
-      </Badge>
     </Stack>
   );
 };

@@ -74,6 +74,13 @@ export const UsersTable: FC<UserRegistryPageProps> = ({ className }) => {
         Cell: ({ cell }) => <>{cell.getValue() || "-"}</>,
       },
       {
+        accessorKey: "steamId64",
+        header: "Steam ID64",
+        sortingFn: "alphanumeric",
+        filterFn: "contains",
+        Cell: ({ cell }) => <>{cell.getValue() || "-"}</>,
+      },
+      {
         id: "roles",
         accessorFn: (row) => row.roles.join(", "),
         header: "Роли",

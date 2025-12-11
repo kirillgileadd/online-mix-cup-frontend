@@ -10,8 +10,9 @@ import {
   Text,
   ActionIcon,
   Tooltip,
+  Menu,
 } from "@mantine/core";
-import { IconReplace } from "@tabler/icons-react";
+import { IconReplace, IconShieldCheck, IconDots } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
 import type { Lobby, Participation, Team } from "../../../shared/api/lobbies";
 import {
@@ -19,6 +20,8 @@ import {
   useStartPlaying,
   useFinishLobby,
   useReplacePlayer,
+  useCreateSteamLobby,
+  useLeaveSteamLobby,
 } from "../index";
 import { isTeamFull } from "../model/teamUtils";
 import { notifications } from "@mantine/notifications";
@@ -76,6 +79,8 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
   const startPlayingMutation = useStartPlaying();
   const finishLobbyMutation = useFinishLobby();
   const replacePlayerMutation = useReplacePlayer();
+  const createSteamLobbyMutation = useCreateSteamLobby();
+  const leaveSteamLobbyMutation = useLeaveSteamLobby();
 
   const getPlayerName = (participant: Participation) =>
     participant.player?.nickname ||
@@ -178,9 +183,25 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
     }
   };
 
+  const generateRandomPassword = (): string => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let password = "";
+    for (let i = 0; i < 6; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+  };
+
   const handleStartPlaying = async () => {
     try {
-      await startPlayingMutation.mutateAsync({ lobbyId: lobby.id });
+      const randomPassword = generateRandomPassword();
+      await startPlayingMutation.mutateAsync({
+        lobbyId: lobby.id,
+        gameName: `lobby${lobby.id}`,
+        gameMode: 2,
+        passKey: randomPassword,
+        serverRegion: 8, // Стокгольм
+      });
       notifications.show({
         title: "Успех",
         message: "Игра начата",
@@ -212,6 +233,75 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
         title: "Ошибка",
         message:
           error instanceof Error ? error.message : "Не удалось завершить лобби",
+        color: "red",
+      });
+    }
+  };
+
+  const handleCreateSteamLobby = async () => {
+    try {
+      const randomPassword = generateRandomPassword();
+      const result = await createSteamLobbyMutation.mutateAsync({
+        lobbyId: lobby.id,
+        gameName: `lobby${lobby.id}`,
+        gameMode: 2,
+        passKey: randomPassword,
+        serverRegion: 8, // Стокгольм
+      });
+
+      if (result.success) {
+        notifications.show({
+          title: "Успех",
+          message: result.message || "Steam лобби успешно создано",
+          color: "green",
+        });
+      } else {
+        notifications.show({
+          title: "Предупреждение",
+          message: result.message || "Steam лобби не было создано",
+          color: "yellow",
+        });
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Не удалось создать Steam лобби";
+
+      notifications.show({
+        title: "Ошибка",
+        message: errorMessage,
+        color: "red",
+      });
+    }
+  };
+
+  const handleLeaveSteamLobby = async () => {
+    try {
+      const result = await leaveSteamLobbyMutation.mutateAsync();
+
+      if (result.success) {
+        notifications.show({
+          title: "Успех",
+          message: result.message || "Бот успешно покинул Steam лобби",
+          color: "green",
+        });
+      } else {
+        notifications.show({
+          title: "Предупреждение",
+          message: result.message || "Бот не смог покинуть Steam лобби",
+          color: "yellow",
+        });
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Не удалось покинуть Steam лобби";
+
+      notifications.show({
+        title: "Ошибка",
+        message: errorMessage,
         color: "red",
       });
     }
@@ -259,7 +349,7 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
   };
 
   return (
-    <Card shadow="sm" padding="md" radius="md" withBorder>
+    <Card shadow="sm" padding="md">
       <Stack gap="md">
         <Group justify="space-between" align="center">
           <Group>
@@ -267,9 +357,6 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
             <Badge color={getStatusColor(lobby.status)}>
               {getStatusLabel(lobby.status)}
             </Badge>
-            <Text size="sm" c="dimmed">
-              Раунд {lobby.round}
-            </Text>
             {winningTeam && (
               <Badge color="green" size="lg" variant="light">
                 🏆 Победитель:{" "}
@@ -290,11 +377,9 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
             </Button>
           )}
 
-          {lobby.status === "DRAFTING" && (
+          {lobby.status === "DRAFTING" && !hasFullTeams && (
             <>
-              {hasFullTeams ? (
-                <Badge color="green">Драфт завершен</Badge>
-              ) : captain1 && captain2 ? (
+              {captain1 && captain2 ? (
                 <Group gap="md" align="center">
                   {lotteryWinnerId && (
                     <Text size="sm" c="yellow" fw={500}>
@@ -331,13 +416,38 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
           )}
 
           {hasFullTeams && !readonly && (
-            <Button
-              onClick={handleStartPlaying}
-              loading={startPlayingMutation.isPending}
-              variant="light"
-            >
-              Начать игру
-            </Button>
+            <Group>
+              <Button
+                onClick={handleStartPlaying}
+                loading={startPlayingMutation.isPending}
+                variant="light"
+              >
+                Начать игру
+              </Button>
+              <Menu shadow="md" width={200}>
+                <Menu.Target>
+                  <ActionIcon variant="light" size="lg">
+                    <IconDots size={16} />
+                  </ActionIcon>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Label>Steam лобби</Menu.Label>
+                  <Menu.Item
+                    onClick={handleCreateSteamLobby}
+                    disabled={createSteamLobbyMutation.isPending}
+                  >
+                    Создать Steam лобби
+                  </Menu.Item>
+                  <Menu.Item
+                    onClick={handleLeaveSteamLobby}
+                    disabled={leaveSteamLobbyMutation.isPending}
+                    color="red"
+                  >
+                    Покинуть Steam лобби
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            </Group>
           )}
 
           {lobby.status === "PLAYING" && !readonly && team1 && team2 && (
@@ -376,6 +486,29 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
                   }
                 }}
               />
+              <Menu shadow="md" width={200}>
+                <Menu.Target>
+                  <ActionIcon variant="light" size="lg">
+                    <IconDots size={16} />
+                  </ActionIcon>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Label>Steam лобби</Menu.Label>
+                  <Menu.Item
+                    onClick={handleCreateSteamLobby}
+                    disabled={createSteamLobbyMutation.isPending}
+                  >
+                    Создать Steam лобби
+                  </Menu.Item>
+                  <Menu.Item
+                    onClick={handleLeaveSteamLobby}
+                    disabled={leaveSteamLobbyMutation.isPending}
+                    color="red"
+                  >
+                    Покинуть Steam лобби
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
             </Group>
           )}
           {lobby.status === "PLAYING" && readonly && (
@@ -427,35 +560,33 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
           </div>
 
           {/* Список всех игроков */}
-          <Stack gap="xs" className="md:basis-1/2 md:flex-1 min-w-0">
+          <div className="md:basis-1/2 md:flex-1 min-w-0">
             <Group justify="space-between" mb="xs">
               <Title order={5}>Игроки лобби</Title>
-              <Badge color="blue">{lobby.participations.length}</Badge>
+              <Badge variant="light" color="blue">{lobby.participations.length}</Badge>
             </Group>
             {lobby.participations.map((participant) => (
               <div
                 key={participant.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-dark-400 px-3 py-2 text-sm"
+                className="flex flex-wrap items-center justify-between text-sm py-2"
               >
                 <div className="flex items-center gap-2">
                   <Text fw={600}>{getPlayerName(participant)}</Text>
                   <div className="flex gap-4 text-gray-400">
                     <span>MMR: {participant.player?.mmr ?? "-"}</span>
+                    <span>Жизни: {participant.player?.lives ?? "-"}</span>
                     <span>Роли: {participant.player?.gameRoles ?? "-"}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="flex gap-1 text-xs">
-                    {participant.isCaptain && (
-                      <Badge size="xs" color="blue">
-                        Капитан
-                      </Badge>
-                    )}
+                  <div className="flex gap-2 text-xs">
+                    {participant.isCaptain && <IconShieldCheck size={16} />}
                     {participant.teamId && (
                       <Badge
                         size="xs"
+                        variant="light"
                         color={
-                          participant.teamId === team1?.id ? "teal" : "grape"
+                          participant.teamId === team1?.id ? "red" : "blue"
                         }
                       >
                         {getTeamLabel(
@@ -484,7 +615,7 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
                 </div>
               </div>
             ))}
-          </Stack>
+          </div>
         </div>
       </Stack>
     </Card>

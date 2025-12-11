@@ -38,6 +38,19 @@ export interface Team {
   participations?: Participation[];
 }
 
+export interface SteamLobby {
+  lobbyId: number;
+  gameName: string;
+  gameMode: number;
+  passKey: string;
+  serverRegion: number;
+  allowCheats: boolean;
+  fillWithBots: boolean;
+  allowSpectating: boolean;
+  visibility: number;
+  allchat: boolean;
+}
+
 export interface Lobby {
   id: number;
   round: number;
@@ -49,6 +62,7 @@ export interface Lobby {
   updatedAt?: string;
   participations: Participation[];
   teams: Team[];
+  steamLobby?: SteamLobby | null;
 }
 
 export interface GenerateLobbiesRequest {
@@ -78,6 +92,10 @@ export type FinishLobbyResponse = Lobby;
 
 export interface StartPlayingRequest {
   lobbyId: number;
+  gameName?: string;
+  gameMode?: number;
+  passKey?: string;
+  serverRegion?: number;
 }
 
 export type StartPlayingResponse = Lobby;
@@ -219,6 +237,42 @@ export const setFirstPicker = async (
   const response = await authorizedApiClient.post<SetFirstPickerResponse>(
     `/lobbies/${data.lobbyId}/set-first-picker`,
     { firstPickerId: data.firstPickerId }
+  );
+  return response.data;
+};
+
+export interface CreateSteamLobbyRequest {
+  lobbyId: number;
+  gameName?: string;
+  gameMode?: number;
+  passKey?: string;
+  serverRegion?: number;
+}
+
+export interface CreateSteamLobbyResponse {
+  success: boolean;
+  message: string;
+  steamLobby: SteamLobby | null;
+}
+
+export interface LeaveSteamLobbyResponse {
+  success: boolean;
+  message: string;
+}
+
+export const createSteamLobby = async (
+  data: CreateSteamLobbyRequest
+): Promise<CreateSteamLobbyResponse> => {
+  const response = await authorizedApiClient.post<CreateSteamLobbyResponse>(
+    "/lobbies/create-steam-lobby",
+    data
+  );
+  return response.data;
+};
+
+export const leaveSteamLobby = async (): Promise<LeaveSteamLobbyResponse> => {
+  const response = await authorizedApiClient.post<LeaveSteamLobbyResponse>(
+    "/lobbies/leave-steam-lobby"
   );
   return response.data;
 };

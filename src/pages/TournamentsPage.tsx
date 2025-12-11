@@ -13,4 +13,3 @@ export const TournamentsPage: FC<TournamentsPageProps> = ({ className }) => {
     </div>
   );
 };
-
