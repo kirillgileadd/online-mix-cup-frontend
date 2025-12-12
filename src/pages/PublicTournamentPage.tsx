@@ -20,6 +20,8 @@ import {
 import type { TournamentStatus } from "../entitity/Tournament";
 import { useTournamentLobbiesLongPoll } from "../features/ManageLobby";
 import { RoundSection } from "../features/ManageLobby/ui";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "../shared/query-keys";
 
 type PublicTournamentPageProps = {
   className?: string;
@@ -44,6 +46,7 @@ type TournamentTabValue = "applications" | "players" | "rounds";
 export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
   className,
 }) => {
+  const queryClient = useQueryClient();
   const { id } = useParams<{ id: string }>();
   const tournamentId = id ? Number(id) : 0;
   const tournamentQuery = useGetPublicTournament(tournamentId);
@@ -51,14 +54,16 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
     useTournamentLobbiesLongPoll(tournamentId);
   const [activeTab, setActiveTab] =
     useState<TournamentTabValue>("applications");
-  const [playersRefreshToken, setPlayersRefreshToken] = useState(0);
 
   const handleTabChange = (value: string | null) => {
     if (!value) return;
     const nextTab = value as TournamentTabValue;
     setActiveTab(nextTab);
     if (nextTab === "players") {
-      setPlayersRefreshToken((prev) => prev + 1);
+      console.log(123);
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.PLAYERS, tournamentId, "public"],
+      });
     }
   };
   const lobbiesByRound = useMemo(() => {
@@ -184,10 +189,7 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
             </Tabs.Panel>
 
             <Tabs.Panel value="players" pt="lg">
-              <TournamentPlayersTable
-                tournamentId={tournamentId}
-                refreshToken={playersRefreshToken}
-              />
+              <TournamentPlayersTable tournamentId={tournamentId} />
             </Tabs.Panel>
 
             <Tabs.Panel value="rounds" pt="lg">

@@ -52,7 +52,7 @@ export const RoundSection: FC<RoundSectionProps> = ({
             <Card padding="md">
               <Group justify="space-between" mb="sm">
                 <Title order={5}>Chill Zone</Title>
-                <Badge variant="light" color="red">
+                <Badge variant="light" color="gray">
                   {chillZoneLoading ? "..." : chillZonePlayers.length}
                 </Badge>
               </Group>

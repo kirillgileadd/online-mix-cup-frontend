@@ -563,7 +563,9 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
           <div className="md:basis-1/2 md:flex-1 min-w-0">
             <Group justify="space-between" mb="xs">
               <Title order={5}>Игроки лобби</Title>
-              <Badge variant="light" color="blue">{lobby.participations.length}</Badge>
+              <Badge variant="light" color="gray">
+                {lobby.participations.length}
+              </Badge>
             </Group>
             {lobby.participations.map((participant) => (
               <div

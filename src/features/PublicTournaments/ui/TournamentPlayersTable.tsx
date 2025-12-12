@@ -1,7 +1,7 @@
 import { Title, Badge, Loader, Center, Text } from "@mantine/core";
 import clsx from "clsx";
 import { MantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
-import { type FC, useEffect, useMemo, useRef } from "react";
+import { type FC, useMemo } from "react";
 import { useGetPublicPlayers } from "../model/useGetPublicPlayers";
 import { useReactTable } from "../../../shared/useReactTable";
 import type { Player, PlayerStatus } from "../../../entitity/Player";
@@ -9,7 +9,6 @@ import type { Player, PlayerStatus } from "../../../entitity/Player";
 type TournamentPlayersTableProps = {
   tournamentId: number;
   className?: string;
-  refreshToken?: number;
 };
 
 const statusLabels: Record<PlayerStatus, string> = {
@@ -27,10 +26,9 @@ const statusColors: Record<PlayerStatus, string> = {
 export const TournamentPlayersTable: FC<TournamentPlayersTableProps> = ({
   tournamentId,
   className,
-  refreshToken,
 }) => {
   const playersQuery = useGetPublicPlayers(tournamentId);
-  const isFirstRefetch = useRef(true);
+
   const numericSortingFn = useMemo(
     () => (rowA: any, rowB: any, columnId: string) => {
       const valueA = Number(
@@ -46,15 +44,6 @@ export const TournamentPlayersTable: FC<TournamentPlayersTableProps> = ({
     },
     []
   );
-
-  useEffect(() => {
-    if (refreshToken === undefined) return;
-    if (isFirstRefetch.current) {
-      isFirstRefetch.current = false;
-      return;
-    }
-    void playersQuery.refetch();
-  }, [refreshToken, playersQuery]);
 
   const columns = useMemo<MRT_ColumnDef<Player>[]>(
     () => [
