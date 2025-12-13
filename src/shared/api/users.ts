@@ -8,6 +8,7 @@ export type GetUsersResponse = User[];
 export interface CreateUserRequest {
   telegramId: string;
   username?: string;
+  nickname?: string;
   photoUrl?: string;
   discordUsername?: string;
   steamId64?: string;
@@ -21,6 +22,7 @@ export interface CreateUserResponse {
 export interface UpdateUserRequest {
   userId: number;
   username?: string;
+  nickname?: string;
   photoUrl?: string;
   discordUsername?: string;
   steamId64?: string;

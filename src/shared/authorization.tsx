@@ -6,7 +6,7 @@ type AppPermissions = {
   users: {
     canView: () => boolean;
     canManage: () => boolean;
-  };
+  },
 };
 
 export function useRole() {

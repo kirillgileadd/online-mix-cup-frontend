@@ -19,9 +19,11 @@ type LobbyParticipantsTableProps = {
 
 const getTeamLabel = (team: Team | null, captain?: Participation | null) => {
   if (captain) {
-    const namePattern = (name?: string) => `${name}'s Team`;
+    const namePattern = (name?: string | null) =>
+      name ? `${name}'s Team` : undefined;
     const name =
-      namePattern(captain.player?.nickname) ||
+      namePattern(captain.player?.user?.nickname) ||
+      namePattern(captain.player?.user?.username) ||
       namePattern(captain.player?.username) ||
       "Неизвестно";
     return name;
@@ -30,7 +32,10 @@ const getTeamLabel = (team: Team | null, captain?: Participation | null) => {
 };
 
 const getPlayerName = (participant: Participation) =>
-  participant.player?.nickname || participant.player?.username || "Неизвестно";
+  participant.player?.user?.nickname ||
+  participant.player?.user?.username ||
+  participant.player?.username ||
+  "Неизвестно";
 
 export const LobbyParticipantsTable: FC<LobbyParticipantsTableProps> = ({
   participations,
@@ -62,7 +67,7 @@ export const LobbyParticipantsTable: FC<LobbyParticipantsTableProps> = ({
   const columns = useMemo<MRT_ColumnDef<Participation>[]>(
     () => [
       {
-        accessorKey: "player.nickname",
+        accessorKey: "player.user.nickname",
         header: "Игрок",
         accessorFn: (row) => getPlayerName(row),
         sortingFn: "alphanumeric",

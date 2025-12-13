@@ -9,6 +9,7 @@ export const validateUserForm = (
 ): {
   telegramId: string;
   username?: string;
+  nickname?: string;
   photoUrl?: string;
   discordUsername?: string;
   steamId64?: string;
@@ -17,9 +18,10 @@ export const validateUserForm = (
   const result: {
     telegramId: string;
     username?: string;
+    nickname?: string;
     photoUrl?: string;
     discordUsername?: string;
-    steamProfileLink?: string;
+    steamId64?: string;
     roles: string[];
   } = {
     telegramId: userData.telegramId.trim(),
@@ -29,6 +31,9 @@ export const validateUserForm = (
   if (userData.username?.trim()) {
     result.username = userData.username.trim();
   }
+  if (userData.nickname?.trim()) {
+    result.nickname = userData.nickname.trim();
+  }
   if (userData.photoUrl?.trim()) {
     result.photoUrl = userData.photoUrl.trim();
   }
@@ -36,7 +41,7 @@ export const validateUserForm = (
     result.discordUsername = userData.discordUsername.trim();
   }
   if (userData.steamProfileLink?.trim()) {
-    result.steamProfileLink = userData.steamProfileLink.trim();
+    result.steamId64 = userData.steamProfileLink.trim();
   }
 
   return result;

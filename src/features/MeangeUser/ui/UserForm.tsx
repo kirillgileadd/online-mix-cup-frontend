@@ -50,6 +50,7 @@ export const UserForm: FC<UserFormProps> = ({
     return {
       telegramId: user.telegramId,
       username: user.username ?? "",
+      nickname: user.nickname ?? "",
       photoUrl: user.photoUrl ?? "",
       discordUsername: user.discordUsername ?? "",
       steamProfileLink: user.steamId64 ?? "",
@@ -69,6 +70,7 @@ export const UserForm: FC<UserFormProps> = ({
     defaultValues: {
       telegramId: "",
       username: "",
+      nickname: "",
       photoUrl: "",
       discordUsername: "",
       steamProfileLink: "",
@@ -105,6 +107,12 @@ export const UserForm: FC<UserFormProps> = ({
             placeholder="Введите username"
             {...register("username")}
             error={errors.username?.message}
+          />
+          <TextInput
+            label="Никнейм"
+            placeholder="Введите никнейм"
+            {...register("nickname")}
+            error={errors.nickname?.message}
           />
           <Controller
             name="roles"

@@ -2,7 +2,6 @@ import { createBrowserRouter, Navigate, redirect } from "react-router-dom";
 import { appSessionStore } from "../shared/session.ts";
 import { LoginPage } from "../pages/LoginPage.tsx";
 import { App } from "./App.tsx";
-import { Layout } from "./Layout.tsx";
 import { UserRole } from "../shared/types.ts";
 import { useRole } from "../shared/authorization.tsx";
 import { ROUTES } from "../shared/routes.ts";
@@ -15,6 +14,7 @@ import { PublicTournamentPage } from "../pages/PublicTournamentPage.tsx";
 import { AdminTournamentPage } from "../pages/AdminTournamentPage.tsx";
 import { ForbiddenPage } from "../pages/ForbiddenPage.tsx";
 import { NotFoundPage } from "../pages/NotFoundPage.tsx";
+import { LeaderboardPage } from "../pages/LeaderboardPage.tsx";
 
 // eslint-disable-next-line react-refresh/only-export-components
 function ProtectedRoute({
@@ -56,7 +56,10 @@ export const router = createBrowserRouter([
         element: <PublicTournamentPage />,
       },
       {
-        element: <Layout />,
+        path: ROUTES.leaderboard,
+        element: <LeaderboardPage />,
+      },
+      {
         loader: () => {
           if (!appSessionStore.getSessionToken()) {
             return redirect(ROUTES.login);

@@ -16,7 +16,6 @@ export interface Participation {
   updatedAt?: string;
   player?: {
     id: number;
-    nickname?: string;
     username: string;
     mmr: number;
     lives: number;
@@ -25,6 +24,7 @@ export interface Participation {
       id: number;
       telegramId: string;
       username?: string | null;
+      nickname?: string | null;
       discordUsername?: string | null;
     } | null;
   } | null;

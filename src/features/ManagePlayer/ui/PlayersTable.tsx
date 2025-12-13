@@ -122,8 +122,9 @@ export const PlayersTable: FC<PlayersTableProps> = ({
         filterFn: "contains",
       },
       {
-        accessorKey: "nickname",
+        accessorKey: "user.nickname",
         header: "Никнейм",
+        accessorFn: (row) => row.user?.nickname || "-",
         sortingFn: "alphanumeric",
         filterFn: "contains",
       },

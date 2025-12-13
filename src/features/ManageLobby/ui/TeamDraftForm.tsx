@@ -15,7 +15,10 @@ type TeamDraftFormProps = {
 };
 
 const getPlayerName = (participant: Participation) =>
-  participant.player?.nickname || participant.player?.username || "Неизвестно";
+  participant.player?.user?.nickname ||
+  participant.player?.user?.username ||
+  participant.player?.username ||
+  "Неизвестно";
 
 /**
  * Расставляет id из массива participations по индексу slot - 1

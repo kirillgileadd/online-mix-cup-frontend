@@ -4,7 +4,6 @@ export interface Player {
   id: number;
   userId: number;
   tournamentId: number;
-  nickname: string;
   seed: number | null;
   score: number | null;
   chillZoneValue: number | null;
@@ -18,6 +17,7 @@ export interface Player {
     id: number;
     telegramId: string;
     username: string | null;
+    nickname: string | null;
   };
   tournament?: {
     id: number;

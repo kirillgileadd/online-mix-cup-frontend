@@ -7,18 +7,15 @@ import {
   Stack,
   Loader,
   Center,
-  Button,
   Image,
   Container,
 } from "@mantine/core";
-import { IconSend, IconSettings } from "@tabler/icons-react";
 import clsx from "clsx";
 import { type FC } from "react";
 import { useGetPublicTournaments } from "../model/useGetPublicTournaments";
 import type { TournamentStatus } from "../../../entitity/Tournament";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../../../shared/routes";
-import { AppCan } from "../../../shared/authorization";
 import dayjs from "dayjs";
 
 type TournamentsListProps = {
@@ -42,10 +39,6 @@ const statusColors: Record<TournamentStatus, string> = {
 export const TournamentsList: FC<TournamentsListProps> = ({ className }) => {
   const tournamentsQuery = useGetPublicTournaments();
 
-  const telegramBotUsername =
-    import.meta.env.VITE_TELEGRAM_BOT_USERNAME || "mixifycup_bot";
-  const telegramBotUrl = `https://t.me/${telegramBotUsername}`;
-
   if (tournamentsQuery.isLoading) {
     return (
       <Center className={clsx("py-12", className)}>
@@ -68,28 +61,6 @@ export const TournamentsList: FC<TournamentsListProps> = ({ className }) => {
     <Container size="xl" className={clsx("", className)}>
       <div className="flex justify-between items-center mb-8">
         <Title size="h1">Турниры</Title>
-        <div className="flex items-center flex-wrap gap-2">
-          <Button
-            component="a"
-            href={telegramBotUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            leftSection={<IconSend size={16} />}
-            color="blue"
-          >
-            Подать заявку
-          </Button>
-          <AppCan action={(permissions) => permissions.users.canManage()}>
-            <Button
-              component={Link}
-              to={ROUTES.adminUsers}
-              leftSection={<IconSettings size={16} />}
-              variant="light"
-            >
-              Админка
-            </Button>
-          </AppCan>
-        </div>
       </div>
       {tournaments.length === 0 ? (
         <Text c="dimmed">Турниры не найдены</Text>

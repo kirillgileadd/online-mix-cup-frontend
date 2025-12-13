@@ -6,6 +6,7 @@ export const ROUTES = {
   adminTournament: (id: number) => `/admin/tournaments/${id}`,
   adminApplications: "/admin/applications",
   adminPlayers: "/admin/players",
+  leaderboard: "/leaderboard",
   forbidden: "/forbidden",
   notFound: "/404",
   publicTournaments: "/tournaments",
@@ -28,12 +29,12 @@ type PathToParams<T> = Record<FilterPathParams<PathToTuple<T>>, string>;
 
 export function replaceParams<T extends `${string}:${string}`>(
   route: T,
-  params: PathToParams<T>,
+  params: PathToParams<T>
 ): string;
 export function replaceParams(
   route: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  params: any,
+  params: any
 ) {
   return route
     .toString()

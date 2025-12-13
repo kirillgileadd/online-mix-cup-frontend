@@ -62,13 +62,13 @@ export const TournamentPlayersTable: FC<TournamentPlayersTableProps> = ({
         },
       },
       {
-        accessorKey: "nickname",
+        accessorKey: "user.nickname",
         header: "Игрок",
         sortingFn: "alphanumeric",
         filterFn: "contains",
         Cell: ({ row }) => (
           <>
-            {row.original.nickname ||
+            {row.original.user?.nickname ||
               row.original.user?.username ||
               row.original.user?.telegramId ||
               "-"}

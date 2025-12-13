@@ -64,9 +64,11 @@ const getStatusLabel = (status: Lobby["status"]) => {
 
 const getTeamLabel = (team: Team | null, captain?: Participation | null) => {
   if (captain) {
-    const namePattern = (name?: string) => `${name}'s Team`;
+    const namePattern = (name?: string | null) =>
+      name ? `${name}'s Team` : undefined;
     const name =
-      namePattern(captain.player?.nickname) ||
+      namePattern(captain.player?.user?.nickname) ||
+      namePattern(captain.player?.user?.username) ||
       namePattern(captain.player?.username) ||
       "Неизвестно";
     return name;
@@ -83,7 +85,8 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
   const leaveSteamLobbyMutation = useLeaveSteamLobby();
 
   const getPlayerName = (participant: Participation) =>
-    participant.player?.nickname ||
+    participant.player?.user?.nickname ||
+    participant.player?.user?.username ||
     participant.player?.username ||
     "Неизвестно";
 

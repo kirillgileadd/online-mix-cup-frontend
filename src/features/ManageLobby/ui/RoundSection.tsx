@@ -66,7 +66,12 @@ export const RoundSection: FC<RoundSectionProps> = ({
                       justify="space-between"
                       className="rounded py-2 text-sm"
                     >
-                      <Text fw={500}>{player.nickname}</Text>
+                      <Text fw={500}>
+                        {player.user?.nickname ||
+                          player.user?.username ||
+                          player.user?.telegramId ||
+                          "-"}
+                      </Text>
                       <Text size="xs" c="dimmed">
                         Жизни: {player.lives ?? "-"} · Chill:{" "}
                         {player.chillZoneValue ?? 0}

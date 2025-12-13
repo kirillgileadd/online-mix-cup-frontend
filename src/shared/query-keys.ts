@@ -10,4 +10,6 @@ export const QUERY_KEYS = {
   PLAYER: "player",
   LOBBIES: "lobbies",
   LOBBY: "lobby",
+  LEADERBOARD: "leaderboard",
+  LEADERBOARD_ITEM: "leaderboardItem",
 } as const;

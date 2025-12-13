@@ -19,7 +19,6 @@ import type { PlayerStatus } from "../../../entitity/Player";
 export type PlayerFormValues = {
   userId?: number;
   tournamentId?: number;
-  nickname: string;
   gameRoles: string;
   mmr: number | null;
   chillZoneValue: number | null;
@@ -79,7 +78,6 @@ export const PlayerForm: FC<PlayerFormProps> = ({
     }
     const player = playerQuery.data;
     return {
-      nickname: player.nickname,
       gameRoles: player.gameRoles ?? "",
       mmr: player.mmr ?? null,
       seed: player.seed,
@@ -99,7 +97,6 @@ export const PlayerForm: FC<PlayerFormProps> = ({
     defaultValues: {
       userId: undefined,
       tournamentId: defaultTournamentId,
-      nickname: "",
       gameRoles: "",
       mmr: null,
       chillZoneValue: 0,
@@ -180,26 +177,6 @@ export const PlayerForm: FC<PlayerFormProps> = ({
               />
             </>
           )}
-
-          <Controller
-            name="nickname"
-            control={control}
-            rules={{
-              required: "Никнейм обязателен",
-              minLength: {
-                value: 2,
-                message: "Минимум 2 символа",
-              },
-            }}
-            render={({ field }) => (
-              <TextInput
-                label="Никнейм"
-                placeholder="Введите никнейм"
-                {...field}
-                error={errors.nickname?.message}
-              />
-            )}
-          />
 
           <Controller
             name="gameRoles"

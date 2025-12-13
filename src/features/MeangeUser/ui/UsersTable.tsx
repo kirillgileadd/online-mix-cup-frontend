@@ -67,6 +67,13 @@ export const UsersTable: FC<UserRegistryPageProps> = ({ className }) => {
         Cell: ({ cell }) => <>{cell.getValue() || "-"}</>,
       },
       {
+        accessorKey: "nickname",
+        header: "Никнейм",
+        sortingFn: "alphanumeric",
+        filterFn: "contains",
+        Cell: ({ cell }) => <>{cell.getValue() || "-"}</>,
+      },
+      {
         accessorKey: "discordUsername",
         header: "Discord Username",
         sortingFn: "alphanumeric",
