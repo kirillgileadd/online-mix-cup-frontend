@@ -66,3 +66,29 @@ export const updateUser = async (
 export const deleteUser = async (userId: number): Promise<void> => {
   await authorizedApiClient.delete(`/users/${userId}`);
 };
+
+export interface UpdateProfileRequest {
+  nickname?: string | null;
+  discordUsername?: string | null;
+  photoBase64?: string | null;
+  steamProfileLink?: string | null;
+}
+
+export type GetProfileResponse = User;
+export type UpdateProfileResponse = User;
+
+export const getProfile = async (): Promise<GetProfileResponse> => {
+  const response =
+    await authorizedApiClient.get<GetProfileResponse>("/users/profile");
+  return response.data;
+};
+
+export const updateProfile = async (
+  data: UpdateProfileRequest
+): Promise<UpdateProfileResponse> => {
+  const response = await authorizedApiClient.patch<UpdateProfileResponse>(
+    "/users/profile",
+    data
+  );
+  return response.data;
+};

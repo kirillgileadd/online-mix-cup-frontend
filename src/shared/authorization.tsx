@@ -5,8 +5,8 @@ import { UserRole } from "./types.ts";
 type AppPermissions = {
   users: {
     canView: () => boolean;
-    canManage: () => boolean;
-  },
+    canManage: (userId?: number) => boolean;
+  };
 };
 
 export function useRole() {
@@ -24,10 +24,19 @@ export const createAdminPermissions = (): AppPermissions => ({
 });
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const createUserPermissions = (): AppPermissions => ({
+export const createUserPermissions = (
+  session: { userId: number; roles: string[] } | null
+): AppPermissions => ({
   users: {
     canView: () => false,
-    canManage: () => false,
+    canManage: (userId?: number) => {
+      if (!session) return false;
+      // Если передан userId и он совпадает с userId в токене, и есть роль player
+      if (userId !== undefined && userId === session.userId) {
+        return session.roles.includes(UserRole.PLAYER);
+      }
+      return false;
+    },
   },
 });
 
@@ -40,15 +49,21 @@ export const defaultPermissions: AppPermissions = {
 };
 
 // Update permissions logic to handle multiple roles
-const createPermissionsFromRoles = (roles: string[] = []): AppPermissions => {
-  const has = (r: string) => roles.includes(r);
+const createPermissionsFromRoles = (
+  session: { userId: number; roles: string[] } | null
+): AppPermissions => {
+  if (!session) {
+    return defaultPermissions;
+  }
+
+  const has = (r: string) => session.roles.includes(r);
 
   if (has(UserRole.ADMIN)) {
     return createAdminPermissions();
   }
 
   if (has(UserRole.PLAYER)) {
-    return createUserPermissions();
+    return createUserPermissions(session);
   }
 
   return defaultPermissions;
@@ -56,7 +71,7 @@ const createPermissionsFromRoles = (roles: string[] = []): AppPermissions => {
 
 function usePermissions(): AppPermissions {
   const session = appSessionStore.useSession();
-  return createPermissionsFromRoles(session?.roles);
+  return createPermissionsFromRoles(session);
 }
 
 const appPermissionsContext = createContext<AppPermissions>(defaultPermissions);

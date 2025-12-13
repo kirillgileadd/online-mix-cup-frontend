@@ -1,7 +1,12 @@
 import { Avatar, Menu, Text } from "@mantine/core";
-import { IconUser, IconLogout, IconSettings } from "@tabler/icons-react";
+import {
+  IconUser,
+  IconLogout,
+  IconSettings,
+  IconUserCircle,
+} from "@tabler/icons-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useTransition } from "react";
+import { useTransition, useMemo } from "react";
 import { logout } from "../../shared/api/auth";
 import { AppCan } from "../../shared/authorization";
 import { ROUTES } from "../../shared/routes";
@@ -29,6 +34,24 @@ export function UserAvatarMenu({ session, className }: UserAvatarMenuProps) {
 
   const displayName = session.username || "Пользователь";
 
+  // Обрабатываем URL фото: если начинается с https - используем как есть, иначе добавляем базовый URL API
+  const avatarPhotoUrl = useMemo(() => {
+    if (!session.photoUrl) {
+      return undefined;
+    }
+
+    // Если начинается с https - используем как есть
+    if (session.photoUrl.startsWith("https://")) {
+      return session.photoUrl;
+    }
+
+    // Если начинается с /uploads или другой относительный путь - добавляем базовый URL API
+    const baseUrl = import.meta.env.VITE_ENVOY_API_URL || "";
+    return `${baseUrl}${session.photoUrl}`;
+  }, [session.photoUrl]);
+
+  console.log(avatarPhotoUrl, "avatarPhotoUrl");
+
   return (
     <Menu shadow="md" width={200} position="bottom-end">
       <Menu.Target>
@@ -41,10 +64,10 @@ export function UserAvatarMenu({ session, className }: UserAvatarMenuProps) {
           <Avatar
             size={40}
             radius={1000}
-            src={session.photoUrl || undefined}
+            src={avatarPhotoUrl}
             className="border-2 border-dark-600"
           >
-            {!session.photoUrl && (
+            {!avatarPhotoUrl && (
               <IconUser size={20} className="text-gray-400" />
             )}
           </Avatar>
@@ -55,6 +78,13 @@ export function UserAvatarMenu({ session, className }: UserAvatarMenuProps) {
       </Menu.Target>
 
       <Menu.Dropdown>
+        <Menu.Item
+          component={Link}
+          to={ROUTES.profile}
+          leftSection={<IconUserCircle size={16} />}
+        >
+          Мой профиль
+        </Menu.Item>
         <AppCan action={(permissions) => permissions.users.canManage()}>
           <Menu.Item
             component={Link}
@@ -77,4 +107,3 @@ export function UserAvatarMenu({ session, className }: UserAvatarMenuProps) {
     </Menu>
   );
 }
-

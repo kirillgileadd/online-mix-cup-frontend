@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import type { FC } from "react";
 import { UsersTable } from "../features/MeangeUser";
+import { Container } from "@mantine/core";
 
 type UsersPageProps = {
   className?: string;
@@ -8,8 +9,8 @@ type UsersPageProps = {
 
 export const UsersPage: FC<UsersPageProps> = ({ className }) => {
   return (
-    <div className={clsx("", className)}>
+    <Container size="xl" className={clsx("py-6", className)}>
       <UsersTable />
-    </div>
+    </Container>
   );
 };

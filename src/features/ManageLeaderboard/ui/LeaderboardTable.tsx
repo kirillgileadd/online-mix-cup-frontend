@@ -18,7 +18,7 @@ import { useUpdateLeaderboardModal } from "./useUpdateLeaderboardModal";
 import { useCreateLeaderboardModal } from "./useCreateLeaderboardModal";
 import { useDeleteLeaderboard } from "../model/useDeleteLeaderboard";
 import { useAddPointsModal } from "./useAddPointsModal";
-import { AppCan } from "../../../shared/authorization";
+import { AppCan, useAppPermissions } from "../../../shared/authorization";
 
 type LeaderboardTableProps = {
   className?: string;
@@ -30,6 +30,7 @@ export const LeaderboardTable: FC<LeaderboardTableProps> = ({ className }) => {
   const deleteMutation = useDeleteLeaderboard();
   const addPointsModal = useAddPointsModal();
   const leaderboardQuery = useGetLeaderboard();
+  const permissions = useAppPermissions();
 
   const handleEdit = (leaderboard: Leaderboard) => {
     updateModal.open(leaderboard.id);
@@ -161,7 +162,7 @@ export const LeaderboardTable: FC<LeaderboardTableProps> = ({ className }) => {
         </Menu>
       </AppCan>
     ),
-    enableRowActions: true,
+    enableRowActions: !!permissions.users.canManage(),
     enableColumnOrdering: false,
     state: {
       isLoading: leaderboardQuery.isLoading,

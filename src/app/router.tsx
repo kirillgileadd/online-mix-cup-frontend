@@ -15,6 +15,7 @@ import { AdminTournamentPage } from "../pages/AdminTournamentPage.tsx";
 import { ForbiddenPage } from "../pages/ForbiddenPage.tsx";
 import { NotFoundPage } from "../pages/NotFoundPage.tsx";
 import { LeaderboardPage } from "../pages/LeaderboardPage.tsx";
+import { ProfilePage } from "../pages/ProfilePage.tsx";
 
 // eslint-disable-next-line react-refresh/only-export-components
 function ProtectedRoute({
@@ -67,6 +68,10 @@ export const router = createBrowserRouter([
           return null;
         },
         children: [
+          {
+            path: ROUTES.profile,
+            element: <ProfilePage />,
+          },
           {
             path: ROUTES.adminUsers,
             element: (

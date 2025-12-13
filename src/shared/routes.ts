@@ -1,6 +1,7 @@
 export const ROUTES = {
   root: "/",
   login: "/login",
+  profile: "/profile",
   adminUsers: "/admin/users",
   adminTournaments: "/admin/tournaments",
   adminTournament: (id: number) => `/admin/tournaments/${id}`,
