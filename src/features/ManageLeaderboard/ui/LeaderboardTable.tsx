@@ -19,6 +19,7 @@ import { useCreateLeaderboardModal } from "./useCreateLeaderboardModal";
 import { useDeleteLeaderboard } from "../model/useDeleteLeaderboard";
 import { useAddPointsModal } from "./useAddPointsModal";
 import { AppCan, useAppPermissions } from "../../../shared/authorization";
+import { getPhotoUrl } from "../../../shared/utils/photoUrl";
 
 type LeaderboardTableProps = {
   className?: string;
@@ -102,10 +103,10 @@ export const LeaderboardTable: FC<LeaderboardTableProps> = ({ className }) => {
               <Avatar
                 size={40}
                 radius={1000}
-                src={row.original.user?.photoUrl || undefined}
+                src={getPhotoUrl(row.original.user?.photoUrl)}
                 className={`border-2 ${borderColor}`}
               >
-                {!row.original.user?.photoUrl && (
+                {!getPhotoUrl(row.original.user?.photoUrl) && (
                   <IconUser size={20} className="text-gray-400" />
                 )}
               </Avatar>

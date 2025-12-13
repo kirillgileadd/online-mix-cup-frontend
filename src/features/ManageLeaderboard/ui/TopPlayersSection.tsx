@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { type FC } from "react";
 import type { Leaderboard } from "../../../entitity/Leaderboard";
 import { IconCrown, IconUser } from "@tabler/icons-react";
+import { getPhotoUrl } from "../../../shared/utils/photoUrl";
 
 type TopPlayersSectionProps = {
   className?: string;
@@ -43,10 +44,10 @@ export const TopPlayersSection: FC<TopPlayersSectionProps> = ({
             <Avatar
               size={80}
               radius={1000}
-              src={secondPlace.user?.photoUrl || undefined}
+              src={getPhotoUrl(secondPlace.user?.photoUrl)}
               className="border-2 border-gray-400"
             >
-              {!secondPlace.user?.photoUrl && (
+              {!getPhotoUrl(secondPlace.user?.photoUrl) && (
                 <IconUser size={40} className="text-gray-400" />
               )}
             </Avatar>
@@ -79,10 +80,10 @@ export const TopPlayersSection: FC<TopPlayersSectionProps> = ({
               <Avatar
                 size={100}
                 radius={1000}
-                src={firstPlace.user?.photoUrl || undefined}
+                src={getPhotoUrl(firstPlace.user?.photoUrl)}
                 className="border-4 border-yellow-500"
               >
-                {!firstPlace.user?.photoUrl && (
+                {!getPhotoUrl(firstPlace.user?.photoUrl) && (
                   <IconUser size={50} className="text-yellow-600" />
                 )}
               </Avatar>
@@ -118,10 +119,10 @@ export const TopPlayersSection: FC<TopPlayersSectionProps> = ({
             <Avatar
               size={80}
               radius={1000}
-              src={thirdPlace.user?.photoUrl || undefined}
+              src={getPhotoUrl(thirdPlace.user?.photoUrl)}
               className="border-2 border-orange-500"
             >
-              {!thirdPlace.user?.photoUrl && (
+              {!getPhotoUrl(thirdPlace.user?.photoUrl) && (
                 <IconUser size={40} className="text-orange-400" />
               )}
             </Avatar>

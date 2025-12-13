@@ -6,12 +6,13 @@ import {
   IconUserCircle,
 } from "@tabler/icons-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useTransition, useMemo } from "react";
+import { useTransition } from "react";
 import { logout } from "../../shared/api/auth";
 import { AppCan } from "../../shared/authorization";
 import { ROUTES } from "../../shared/routes";
 import clsx from "clsx";
 import type { Session } from "../../shared/session";
+import { getPhotoUrl } from "../../shared/utils/photoUrl";
 
 type UserAvatarMenuProps = {
   session: Session | null;
@@ -33,24 +34,7 @@ export function UserAvatarMenu({ session, className }: UserAvatarMenuProps) {
   }
 
   const displayName = session.username || "Пользователь";
-
-  // Обрабатываем URL фото: если начинается с https - используем как есть, иначе добавляем базовый URL API
-  const avatarPhotoUrl = useMemo(() => {
-    if (!session.photoUrl) {
-      return undefined;
-    }
-
-    // Если начинается с https - используем как есть
-    if (session.photoUrl.startsWith("https://")) {
-      return session.photoUrl;
-    }
-
-    // Если начинается с /uploads или другой относительный путь - добавляем базовый URL API
-    const baseUrl = import.meta.env.VITE_ENVOY_API_URL || "";
-    return `${baseUrl}${session.photoUrl}`;
-  }, [session.photoUrl]);
-
-  console.log(avatarPhotoUrl, "avatarPhotoUrl");
+  const avatarPhotoUrl = getPhotoUrl(session.photoUrl);
 
   return (
     <Menu shadow="md" width={200} position="bottom-end">
