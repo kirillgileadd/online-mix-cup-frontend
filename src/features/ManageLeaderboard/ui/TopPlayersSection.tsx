@@ -19,8 +19,8 @@ export const TopPlayersSection: FC<TopPlayersSectionProps> = ({
 
   const getPlayerName = (player: Leaderboard) => {
     return (
-      player.user?.username ||
       player.user?.nickname ||
+      player.user?.username ||
       player.user?.telegramId ||
       "Неизвестный"
     );

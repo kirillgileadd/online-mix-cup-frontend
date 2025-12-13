@@ -43,7 +43,7 @@ export const LeaderboardForm: FC<LeaderboardFormProps> = ({
     return (
       usersQuery.data?.map((user) => ({
         value: user.id.toString(),
-        label: user.username || user.nickname || user.telegramId,
+        label: user.nickname || user.username || user.telegramId,
       })) ?? []
     );
   }, [usersQuery.data]);
@@ -103,9 +103,7 @@ export const LeaderboardForm: FC<LeaderboardFormProps> = ({
                   placeholder="Выберите пользователя"
                   data={userOptions}
                   value={
-                    field.value && field.value > 0
-                      ? field.value.toString()
-                      : ""
+                    field.value && field.value > 0 ? field.value.toString() : ""
                   }
                   onChange={(value) =>
                     field.onChange(value ? Number(value) : 0)
@@ -151,9 +149,7 @@ export const LeaderboardForm: FC<LeaderboardFormProps> = ({
                       ? null
                       : new Date()
                 }
-                onChange={(date) =>
-                  field.onChange(date?.toISOString() || null)
-                }
+                onChange={(date) => field.onChange(date?.toISOString() || null)}
                 error={errors.createdAt?.message}
               />
             )}
@@ -167,4 +163,3 @@ export const LeaderboardForm: FC<LeaderboardFormProps> = ({
     </Box>
   );
 };
-
