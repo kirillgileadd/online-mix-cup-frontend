@@ -200,8 +200,8 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
       const randomPassword = generateRandomPassword();
       await startPlayingMutation.mutateAsync({
         lobbyId: lobby.id,
-        gameName: `lobby${lobby.id}`,
-        gameMode: 2,
+        gameName: `mf${lobby.id}`,
+        gameMode: 16,
         passKey: randomPassword,
         serverRegion: 8, // Стокгольм
       });

@@ -22,6 +22,7 @@ import { useTournamentLobbiesLongPoll } from "../features/ManageLobby";
 import { RoundSection } from "../features/ManageLobby/ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "../shared/query-keys";
+import { TwitchEmbed } from "../widgets/TwitchEmbed";
 
 type PublicTournamentPageProps = {
   className?: string;
@@ -41,7 +42,7 @@ const statusColors: Record<TournamentStatus, string> = {
   finished: "dark",
 };
 
-type TournamentTabValue = "applications" | "players" | "rounds";
+type TournamentTabValue = "applications" | "players" | "rounds" | "stream";
 
 export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
   className,
@@ -92,6 +93,9 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
   }
 
   const tournament = tournamentQuery.data;
+
+  // TODO: Заменить на реальный канал из данных турнира или пропсов
+  const twitchChannel = "19teeen"; // Замените на нужный канал Twitch
 
   const roundNumbers = Object.keys(lobbiesByRound)
     .map(Number)
@@ -180,6 +184,14 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
             >
               Раунды
             </Tabs.Tab>
+            <Tabs.Tab
+              classNames={{
+                tab: "px-4! py-3! hover:text-primary",
+              }}
+              value="stream"
+            >
+              Трансляция
+            </Tabs.Tab>
           </Container>
         </Tabs.List>
         <div className="bg-dark-800 grow pb-6">
@@ -213,6 +225,18 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
                   ))
                 )}
               </Stack>
+            </Tabs.Panel>
+
+            <Tabs.Panel value="stream" pt="lg">
+              {activeTab === "stream" && (
+                <Stack gap="md">
+                  <Title order={2}>Трансляция</Title>
+                  <TwitchEmbed
+                    key={`twitch-embed-${activeTab}`}
+                    channel={twitchChannel}
+                  />
+                </Stack>
+              )}
             </Tabs.Panel>
           </Container>
         </div>
