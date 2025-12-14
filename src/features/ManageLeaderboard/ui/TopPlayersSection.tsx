@@ -10,14 +10,46 @@ type TopPlayersSectionProps = {
   topPlayers: Leaderboard[];
 };
 
+type PlaceConfig = {
+  position: number;
+  borderColor: string;
+  badgeColor: string;
+  textColor: string;
+  pointsColor: string;
+  showCrown: boolean;
+};
+
+const PLACE_CONFIGS: Record<number, PlaceConfig> = {
+  1: {
+    position: 1,
+    borderColor: "border-yellow-500",
+    badgeColor: "yellow",
+    textColor: "white",
+    pointsColor: "yellow",
+    showCrown: true,
+  },
+  2: {
+    position: 2,
+    borderColor: "border-gray-400",
+    badgeColor: "gray",
+    textColor: "white",
+    pointsColor: "dimmed",
+    showCrown: false,
+  },
+  3: {
+    position: 3,
+    borderColor: "border-orange-500",
+    badgeColor: "orange",
+    textColor: "white",
+    pointsColor: "dimmed",
+    showCrown: false,
+  },
+};
+
 export const TopPlayersSection: FC<TopPlayersSectionProps> = ({
   className,
   topPlayers,
 }) => {
-  const firstPlace = topPlayers[0];
-  const secondPlace = topPlayers[1];
-  const thirdPlace = topPlayers[2];
-
   const getPlayerName = (player: Leaderboard) => {
     return (
       player.user?.nickname ||
@@ -27,119 +59,93 @@ export const TopPlayersSection: FC<TopPlayersSectionProps> = ({
     );
   };
 
+  const topThree = topPlayers.slice(0, 3);
+  // Порядок отображения: 2-е место, 1-е место, 3-е место
+  const displayOrder = [
+    topThree[1], // 2-е место
+    topThree[0], // 1-е место
+    topThree[2], // 3-е место
+  ].filter(Boolean);
+
   return (
     <div
       className={clsx("grid grid-cols-1 md:grid-cols-3 gap-6 mb-8", className)}
     >
-      {/* 2nd Place */}
-      {secondPlace && (
-        <Card
-          shadow="sm"
-          padding="lg"
-          radius="md"
-          withBorder
-          className="bg-dark-700 border-dark-600"
-        >
-          <Stack align="center" gap="md">
-            <Avatar
-              size={80}
-              radius={1000}
-              src={getPhotoUrl(secondPlace.user?.photoUrl)}
-              className="border-2 border-gray-400"
-            >
-              {!getPhotoUrl(secondPlace.user?.photoUrl) && (
-                <IconUser size={40} className="text-gray-400" />
-              )}
-            </Avatar>
-            <Badge color="gray" variant="light" size="lg">
-              2-е место
-            </Badge>
-            <Text fw={500} size="lg" c="white" ta="center">
-              {getPlayerName(secondPlace)}
-            </Text>
-            {secondPlace.points !== undefined && (
-              <Text size="sm" c="dimmed">
-                {secondPlace.points} очков
-              </Text>
-            )}
-          </Stack>
-        </Card>
-      )}
+      {displayOrder.map((player, index) => {
+        // Определяем реальное место: индекс 0 = 2-е место, индекс 1 = 1-е место, индекс 2 = 3-е место
+        const place = index === 0 ? 2 : index === 1 ? 1 : 3;
+        const config = PLACE_CONFIGS[place];
+        if (!config || !player) return null;
 
-      {/* 1st Place */}
-      {firstPlace && (
-        <Card
-          shadow="lg"
-          padding="lg"
-          radius="md"
-          withBorder
-          className="bg-dark-700 border-yellow-500 border-2"
-        >
-          <Stack align="center" gap="md">
-            <div className="relative">
-              <Avatar
-                size={100}
-                radius={1000}
-                src={getPhotoUrl(firstPlace.user?.photoUrl)}
-                className="border-4 border-yellow-500"
-              >
-                {!getPhotoUrl(firstPlace.user?.photoUrl) && (
-                  <IconUser size={50} className="text-yellow-600" />
+        return (
+          <Card
+            key={player.id || index}
+            shadow={place === 1 ? "lg" : "sm"}
+            padding="lg"
+            radius="md"
+            withBorder
+            className={clsx(
+              "bg-dark-700 border-2 h-full flex flex-col",
+              config.borderColor
+            )}
+          >
+            <Stack align="center" gap="md" className="flex-1">
+              <div className="relative">
+                <Avatar
+                  size={90}
+                  radius={1000}
+                  src={getPhotoUrl(player.user?.photoUrl)}
+                  className={clsx(
+                    "border-2",
+                    config.borderColor,
+                    place === 1 && "border-4"
+                  )}
+                >
+                  {!getPhotoUrl(player.user?.photoUrl) && (
+                    <IconUser
+                      size={45}
+                      className={clsx(
+                        place === 1 && "text-yellow-500",
+                        place === 2 && "text-gray-400",
+                        place === 3 && "text-orange-500"
+                      )}
+                    />
+                  )}
+                </Avatar>
+                {config.showCrown && (
+                  <div className="absolute -top-3 -right-3 z-10">
+                    <IconCrown
+                      size={28}
+                      className="text-yellow-500 fill-yellow-500"
+                      stroke={2}
+                    />
+                  </div>
                 )}
-              </Avatar>
-              <div className="absolute -top-2 -right-2">
-                <IconCrown size={24} className="text-yellow-500" />
               </div>
-            </div>
-            <Badge color="yellow" variant="light" size="lg">
-              1-е место
-            </Badge>
-            <Text fw={700} size="xl" c="white" ta="center">
-              {getPlayerName(firstPlace)}
-            </Text>
-            {firstPlace.points !== undefined && (
-              <Text size="md" fw={500} c="yellow">
-                {firstPlace.points} очков
+              <Badge color={config.badgeColor} variant="light" size="lg">
+                {place}-е место
+              </Badge>
+              <Text
+                fw={place === 1 ? 700 : 500}
+                size="lg"
+                c={config.textColor}
+                ta="center"
+              >
+                {getPlayerName(player)}
               </Text>
-            )}
-          </Stack>
-        </Card>
-      )}
-
-      {/* 3rd Place */}
-      {thirdPlace && (
-        <Card
-          shadow="sm"
-          padding="lg"
-          radius="md"
-          withBorder
-          className="bg-dark-700 border-dark-600"
-        >
-          <Stack align="center" gap="md">
-            <Avatar
-              size={80}
-              radius={1000}
-              src={getPhotoUrl(thirdPlace.user?.photoUrl)}
-              className="border-2 border-orange-500"
-            >
-              {!getPhotoUrl(thirdPlace.user?.photoUrl) && (
-                <IconUser size={40} className="text-orange-400" />
+              {player.points !== undefined && (
+                <Text
+                  size="sm"
+                  fw={place === 1 ? 500 : 400}
+                  c={config.pointsColor}
+                >
+                  {player.points} очков
+                </Text>
               )}
-            </Avatar>
-            <Badge color="orange" variant="light" size="lg">
-              3-е место
-            </Badge>
-            <Text fw={500} size="lg" c="white" ta="center">
-              {getPlayerName(thirdPlace)}
-            </Text>
-            {thirdPlace.points !== undefined && (
-              <Text size="sm" c="dimmed">
-                {thirdPlace.points} очков
-              </Text>
-            )}
-          </Stack>
-        </Card>
-      )}
+            </Stack>
+          </Card>
+        );
+      })}
     </div>
   );
 };
