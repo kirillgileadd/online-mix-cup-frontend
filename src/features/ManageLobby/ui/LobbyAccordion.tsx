@@ -132,6 +132,11 @@ export const LobbyAccordion: FC<LobbyAccordionProps> = ({
       <Accordion.Item className="border-none!" value={accordionValue}>
         <Accordion.Control>
           <Group justify="space-between" w="100%" wrap="nowrap">
+            {/* Информация о раунде слева */}
+            <Text size="sm" c="dimmed" className="shrink-0 mr-4">
+              Раунд {lobby.round}
+            </Text>
+
             <Group
               gap="lg"
               wrap="nowrap"
@@ -147,12 +152,7 @@ export const LobbyAccordion: FC<LobbyAccordionProps> = ({
                 justify="flex-end"
               >
                 <div className="relative shrink-0">
-                  <Avatar
-                    size={48}
-                    radius={1000}
-                    src={captain1Photo}
-                    className="border-2 border-red-500"
-                  >
+                  <Avatar size={48} radius={1000} src={captain1Photo}>
                     {!captain1Photo && (
                       <IconUser size={24} className="text-gray-400" />
                     )}
@@ -196,12 +196,7 @@ export const LobbyAccordion: FC<LobbyAccordionProps> = ({
                 justify="flex-start"
               >
                 <div className="relative shrink-0">
-                  <Avatar
-                    size={48}
-                    radius={1000}
-                    src={captain2Photo}
-                    className="border-2 border-blue-500"
-                  >
+                  <Avatar size={48} radius={1000} src={captain2Photo}>
                     {!captain2Photo && (
                       <IconUser size={24} className="text-gray-400" />
                     )}
