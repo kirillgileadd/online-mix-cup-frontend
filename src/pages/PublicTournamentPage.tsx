@@ -8,6 +8,8 @@ import {
   Center,
   Tabs,
   Container,
+  SegmentedControl,
+  VisuallyHidden,
 } from "@mantine/core";
 import clsx from "clsx";
 import { type FC, useMemo, useState } from "react";
@@ -19,10 +21,11 @@ import {
 } from "../features/PublicTournaments";
 import type { TournamentStatus } from "../entitity/Tournament";
 import { useTournamentLobbiesLongPoll } from "../features/ManageLobby";
-import { RoundSection } from "../features/ManageLobby/ui";
+import { LobbyAccordion, RoundSection } from "../features/ManageLobby/ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "../shared/query-keys";
 import { TwitchEmbed } from "../widgets/TwitchEmbed";
+import { IconDeviceGamepad2, IconStack } from "@tabler/icons-react";
 
 type PublicTournamentPageProps = {
   className?: string;
@@ -55,6 +58,37 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
     useTournamentLobbiesLongPoll(tournamentId);
   const [activeTab, setActiveTab] =
     useState<TournamentTabValue>("applications");
+  const [viewMode, setViewMode] = useState<"lobbies" | "rounds">("lobbies");
+
+  // Сортируем лобби: сначала по раунду, потом по ID
+  // Важно: этот хук должен быть вызван до любых условных возвратов
+  const sortedLobbies = useMemo(() => {
+    return [...lobbies].sort((a, b) => {
+      if (a.round !== b.round) {
+        return a.round - b.round;
+      }
+      return a.id - b.id;
+    });
+  }, [lobbies]);
+
+  // Группируем лобби по раундам для режима отображения по раундам
+  const lobbiesByRound = useMemo(() => {
+    return sortedLobbies.reduce<Record<number, typeof sortedLobbies>>(
+      (acc, lobby) => {
+        const round = lobby.round;
+        if (!acc[round]) acc[round] = [];
+        acc[round].push(lobby);
+        return acc;
+      },
+      {}
+    );
+  }, [sortedLobbies]);
+
+  const roundNumbers = useMemo(() => {
+    return Object.keys(lobbiesByRound)
+      .map(Number)
+      .sort((a, b) => a - b);
+  }, [lobbiesByRound]);
 
   const handleTabChange = (value: string | null) => {
     if (!value) return;
@@ -67,14 +101,6 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
       });
     }
   };
-  const lobbiesByRound = useMemo(() => {
-    return lobbies.reduce<Record<number, typeof lobbies>>((acc, lobby) => {
-      const round = lobby.round;
-      if (!acc[round]) acc[round] = [];
-      acc[round].push(lobby);
-      return acc;
-    }, {});
-  }, [lobbies]);
 
   if (tournamentQuery.isLoading) {
     return (
@@ -96,10 +122,6 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
 
   // TODO: Заменить на реальный канал из данных турнира или пропсов
   const twitchChannel = "19teeen"; // Замените на нужный канал Twitch
-
-  const roundNumbers = Object.keys(lobbiesByRound)
-    .map(Number)
-    .sort((a, b) => a - b);
 
   return (
     <div className={clsx("min-h-screen h-full flex flex-col pt-6", className)}>
@@ -206,23 +228,66 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
 
             <Tabs.Panel value="rounds" pt="lg">
               <Stack gap="md">
-                <Title order={2}>Раунды</Title>
+                <Group justify="space-between" align="center">
+                  <Title order={2}>Раунды</Title>
+                  <SegmentedControl
+                    value={viewMode}
+                    color="blue"
+                    size="md"
+                    onChange={(value) =>
+                      setViewMode(value as "lobbies" | "rounds")
+                    }
+                    data={[
+                      {
+                        label: (
+                          <>
+                            <IconDeviceGamepad2 size={26} />
+                            <VisuallyHidden>По играм</VisuallyHidden>
+                          </>
+                        ),
+                        value: "lobbies",
+                      },
+                      {
+                        label: (
+                          <>
+                            <IconStack size={26} />
+                            <VisuallyHidden>По раундам</VisuallyHidden>
+                          </>
+                        ),
+                        value: "rounds",
+                      },
+                    ]}
+                  />
+                </Group>
                 {lobbiesLoading ? (
                   <Center py="xl">
                     <Loader />
                   </Center>
-                ) : roundNumbers.length === 0 ? (
+                ) : sortedLobbies.length === 0 ? (
                   <Text c="dimmed">Лобби еще не были сгенерированы.</Text>
+                ) : viewMode === "lobbies" ? (
+                  <Stack gap="md">
+                    {sortedLobbies.map((lobby) => (
+                      <LobbyAccordion
+                        key={lobby.id}
+                        lobby={lobby}
+                        readonly
+                        tournamentId={tournamentId}
+                      />
+                    ))}
+                  </Stack>
                 ) : (
-                  roundNumbers.map((round) => (
-                    <RoundSection
-                      key={round}
-                      round={round}
-                      lobbies={lobbiesByRound[round] ?? []}
-                      tournamentId={tournamentId}
-                      readonly
-                    />
-                  ))
+                  <Stack gap="md">
+                    {roundNumbers.map((round) => (
+                      <RoundSection
+                        key={round}
+                        round={round}
+                        lobbies={lobbiesByRound[round] ?? []}
+                        tournamentId={tournamentId}
+                        readonly
+                      />
+                    ))}
+                  </Stack>
                 )}
               </Stack>
             </Tabs.Panel>

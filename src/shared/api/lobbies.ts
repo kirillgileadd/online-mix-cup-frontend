@@ -26,6 +26,7 @@ export interface Participation {
       username?: string | null;
       nickname?: string | null;
       discordUsername?: string | null;
+      photoUrl?: string | null;
     } | null;
   } | null;
 }
