@@ -20,10 +20,11 @@ export const PublicTournamentsPage: FC<PublicTournamentsPageProps> = ({
           <img
             src="/dragonstouch_loading_screen.png"
             alt=""
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover opacity-30"
           />
         </picture>
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-dark-900 via-[#0a1628] via-50% to-[#0c4a6e]/40 z-0 pointer-events-none" />
+        {/* Градиент от темно-синего/бирюзового внизу к черному вверху */}
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-dark-900 via-[#0a1628] via-20% to-[#0c4a6e]/40 z-0 pointer-events-none" />
       </div>
       <div>
         <TournamentsList />
