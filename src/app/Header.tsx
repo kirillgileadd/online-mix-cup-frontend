@@ -22,6 +22,10 @@ export function Header() {
       return "border-none";
     }
 
+    if (pathname === ROUTES.aboutTournament) {
+      return "transparent border-none absolute top-0 left-0 right-0 z-50";
+    }
+
     return "bg-dark-800 border-b border-dark-600 shadow";
   };
 
@@ -79,6 +83,12 @@ export function Header() {
                 className="text-dark-100 hover:text-dark-50 transition-colors"
               >
                 Лидерборд
+              </Link>
+              <Link
+                to={ROUTES.aboutTournament}
+                className="text-dark-100 hover:text-dark-50 transition-colors"
+              >
+                О турнире
               </Link>
             </nav>
           </div>

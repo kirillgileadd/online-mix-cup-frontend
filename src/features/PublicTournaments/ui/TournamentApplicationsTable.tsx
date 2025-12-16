@@ -25,6 +25,22 @@ export const TournamentApplicationsTable: FC<
 > = ({ tournamentId, className }) => {
   const applicationsQuery = useGetPublicApplications(tournamentId);
 
+  const numericSortingFn = useMemo(
+    () => (rowA: any, rowB: any, columnId: string) => {
+      const valueA = Number(
+        rowA.getValue(columnId) ?? Number.NEGATIVE_INFINITY
+      );
+      const valueB = Number(
+        rowB.getValue(columnId) ?? Number.NEGATIVE_INFINITY
+      );
+      if (Number.isNaN(valueA) && Number.isNaN(valueB)) return 0;
+      if (Number.isNaN(valueA)) return 1;
+      if (Number.isNaN(valueB)) return -1;
+      return valueA - valueB;
+    },
+    []
+  );
+
   const columns = useMemo<MRT_ColumnDef<Application>[]>(
     () => [
       {
@@ -37,8 +53,9 @@ export const TournamentApplicationsTable: FC<
       {
         accessorKey: "mmr",
         header: "MMR",
-        sortingFn: "numeric",
+        sortingFn: numericSortingFn,
         filterFn: "equals",
+        Cell: ({ cell }) => <>{cell.getValue() ?? "-"}</>,
       },
       {
         accessorKey: "gameRoles",
@@ -83,7 +100,7 @@ export const TournamentApplicationsTable: FC<
         },
       },
     ],
-    []
+    [numericSortingFn]
   );
 
   const table = useReactTable({

@@ -4,6 +4,9 @@ const config: Config = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      fontSize: {
+        "10xl": ["20rem", { lineHeight: "1" }],
+      },
       colors: {
         dark: {
           50: "#C1C2C5",
@@ -112,6 +115,7 @@ const config: Config = {
           700: "#1098AD",
           800: "#0C8599",
           900: "#0B7285",
+          light: "#51E8F4",
         },
         teal: {
           50: "#E6FCF5",

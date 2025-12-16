@@ -23,7 +23,7 @@ export const PublicTournamentsPage: FC<PublicTournamentsPageProps> = ({
             className="w-full h-full object-cover"
           />
         </picture>
-        <div className="absolute top-0 left-0 w-full h-full bg-black/70 z-0 pointer-events-none" />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-dark-900 via-[#0a1628] via-50% to-[#0c4a6e]/40 z-0 pointer-events-none" />
       </div>
       <div>
         <TournamentsList />

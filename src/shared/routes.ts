@@ -12,6 +12,7 @@ export const ROUTES = {
   notFound: "/404",
   publicTournaments: "/tournaments",
   publicTournament: (id: number) => `/tournaments/${id}`,
+  aboutTournament: "/about",
 } as const;
 
 type PathToTuple<T> = T extends `/${infer P1}/${infer Rest}`

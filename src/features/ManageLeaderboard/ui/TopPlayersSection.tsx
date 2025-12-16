@@ -46,6 +46,12 @@ const PLACE_CONFIGS: Record<number, PlaceConfig> = {
   },
 };
 
+const PRIZE_AMOUNTS: Record<number, string> = {
+  1: "5000₽",
+  2: "2500₽",
+  3: "1000₽",
+};
+
 export const TopPlayersSection: FC<TopPlayersSectionProps> = ({
   className,
   topPlayers,
@@ -140,6 +146,16 @@ export const TopPlayersSection: FC<TopPlayersSectionProps> = ({
                   c={config.pointsColor}
                 >
                   {player.points} очков
+                </Text>
+              )}
+              {PRIZE_AMOUNTS[place] && (
+                <Text
+                  size="md"
+                  fw={place === 1 ? 700 : 600}
+                  c={place === 1 ? "yellow" : place === 2 ? "gray" : "orange"}
+                  className="mt-2"
+                >
+                  Приз: {PRIZE_AMOUNTS[place]}
                 </Text>
               )}
             </Stack>

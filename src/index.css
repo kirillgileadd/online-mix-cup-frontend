@@ -99,6 +99,7 @@
   --color-cyan-700: #1098ad;
   --color-cyan-800: #0c8599;
   --color-cyan-900: #0b7285;
+  --color-cyan-light: #51e8f4;
 
   --color-teal-50: #e6fcf5;
   --color-teal-100: #c3fae8;
@@ -154,4 +155,18 @@
   --color-orange-700: #f76707;
   --color-orange-800: #e8590c;
   --color-orange-900: #d9480f;
+}
+
+@keyframes pulse-slow {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
