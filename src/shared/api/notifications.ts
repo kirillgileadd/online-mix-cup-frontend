@@ -71,7 +71,7 @@ class NotificationService {
 
       for (const format of soundFormats) {
         const audio = new Audio(`/dota2-match-found.${format}`);
-        audio.volume = 0.7; // Устанавливаем громкость
+        audio.volume = 0.3; // Устанавливаем громкость
         audio.preload = "auto";
 
         // Проверяем, может ли браузер воспроизвести этот формат
