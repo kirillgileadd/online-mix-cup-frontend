@@ -17,6 +17,7 @@ import { NotFoundPage } from "../pages/NotFoundPage.tsx";
 import { LeaderboardPage } from "../pages/LeaderboardPage.tsx";
 import { ProfilePage } from "../pages/ProfilePage.tsx";
 import { AboutTournamentPage } from "../pages/AboutTournamentPage.tsx";
+import { RegulationPage } from "../pages/RegulationPage.tsx";
 
 // eslint-disable-next-line react-refresh/only-export-components
 function ProtectedRoute({
@@ -64,6 +65,10 @@ export const router = createBrowserRouter([
       {
         path: ROUTES.aboutTournament,
         element: <AboutTournamentPage />,
+      },
+      {
+        path: ROUTES.regulation,
+        element: <RegulationPage />,
       },
       {
         loader: () => {

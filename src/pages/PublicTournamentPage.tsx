@@ -12,8 +12,9 @@ import {
   VisuallyHidden,
 } from "@mantine/core";
 import clsx from "clsx";
-import { type FC, useMemo, useState } from "react";
+import { type FC, useMemo, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { useMediaQuery } from "@mantine/hooks";
 import {
   useGetPublicTournament,
   TournamentApplicationsTable,
@@ -59,6 +60,14 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
   const [activeTab, setActiveTab] =
     useState<TournamentTabValue>("applications");
   const [viewMode, setViewMode] = useState<"lobbies" | "rounds">("lobbies");
+  const isDesktop = useMediaQuery("(min-width: 64rem)");
+
+  // На мобильных принудительно используем режим "по раундам"
+  useEffect(() => {
+    if (!isDesktop) {
+      setViewMode("rounds");
+    }
+  }, [isDesktop]);
 
   // Сортируем лобби: сначала по раунду, потом по ID
   // Важно: этот хук должен быть вызван до любых условных возвратов
@@ -230,34 +239,36 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
               <Stack gap="md">
                 <Group justify="space-between" align="center">
                   <Title order={2}>Раунды</Title>
-                  <SegmentedControl
-                    value={viewMode}
-                    color="blue"
-                    size="md"
-                    onChange={(value) =>
-                      setViewMode(value as "lobbies" | "rounds")
-                    }
-                    data={[
-                      {
-                        label: (
-                          <>
-                            <IconDeviceGamepad2 size={26} />
-                            <VisuallyHidden>По играм</VisuallyHidden>
-                          </>
-                        ),
-                        value: "lobbies",
-                      },
-                      {
-                        label: (
-                          <>
-                            <IconStack size={26} />
-                            <VisuallyHidden>По раундам</VisuallyHidden>
-                          </>
-                        ),
-                        value: "rounds",
-                      },
-                    ]}
-                  />
+                  {isDesktop && (
+                    <SegmentedControl
+                      value={viewMode}
+                      color="blue"
+                      size="md"
+                      onChange={(value) =>
+                        setViewMode(value as "lobbies" | "rounds")
+                      }
+                      data={[
+                        {
+                          label: (
+                            <>
+                              <IconDeviceGamepad2 size={26} />
+                              <VisuallyHidden>По играм</VisuallyHidden>
+                            </>
+                          ),
+                          value: "lobbies",
+                        },
+                        {
+                          label: (
+                            <>
+                              <IconStack size={26} />
+                              <VisuallyHidden>По раундам</VisuallyHidden>
+                            </>
+                          ),
+                          value: "rounds",
+                        },
+                      ]}
+                    />
+                  )}
                 </Group>
                 {lobbiesLoading ? (
                   <Center py="xl">

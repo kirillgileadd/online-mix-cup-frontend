@@ -52,7 +52,7 @@ export const AboutTournamentPage: FC<AboutTournamentPageProps> = ({
             <Title
               order={1}
               classNames={{ root: "text-[4rem]!" }}
-              className="text-white font-bold uppercase italic tracking-tight leading-[1.1]"
+              className="text-white font-black! uppercase italic tracking-tight leading-[1.1]"
             >
               ТУРНИР ПО DOTA 2
               <br />
