@@ -3,7 +3,6 @@ import { appSessionStore } from "../shared/session.ts";
 import { Button, Container, Drawer, ActionIcon } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useMediaQuery } from "@mantine/hooks";
-import { AppCan } from "../shared/authorization.tsx";
 import { ROUTES } from "../shared/routes.ts";
 import clsx from "clsx";
 import { IconSend, IconMenu2 } from "@tabler/icons-react";
@@ -75,42 +74,6 @@ export function Header() {
 
   const navigationLinks = (isMobile = false) => (
     <>
-      <AppCan action={(permissions) => permissions.users.canManage()}>
-        <Link
-          to={ROUTES.adminUsers}
-          onClick={isMobile ? handleLinkClick : undefined}
-          className={getLinkClassName(isMobile)}
-        >
-          Пользаки
-        </Link>
-      </AppCan>
-      <AppCan action={(permissions) => permissions.users.canManage()}>
-        <Link
-          to={ROUTES.adminTournaments}
-          onClick={isMobile ? handleLinkClick : undefined}
-          className={getLinkClassName(isMobile)}
-        >
-          Турниры
-        </Link>
-      </AppCan>
-      <AppCan action={(permissions) => permissions.users.canManage()}>
-        <Link
-          to={ROUTES.adminApplications}
-          onClick={isMobile ? handleLinkClick : undefined}
-          className={getLinkClassName(isMobile)}
-        >
-          Заявки
-        </Link>
-      </AppCan>
-      <AppCan action={(permissions) => permissions.users.canManage()}>
-        <Link
-          to={ROUTES.adminPlayers}
-          onClick={isMobile ? handleLinkClick : undefined}
-          className={getLinkClassName(isMobile)}
-        >
-          Игроки
-        </Link>
-      </AppCan>
       <Link
         to={ROUTES.leaderboard}
         onClick={isMobile ? handleLinkClick : undefined}

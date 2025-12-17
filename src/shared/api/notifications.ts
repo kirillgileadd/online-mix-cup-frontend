@@ -1,6 +1,7 @@
 import { appSessionStore } from "../session.ts";
 import { notifications } from "@mantine/notifications";
 import { ROUTES } from "../routes.ts";
+import { authorizedApiClient } from "./client.ts";
 
 export type NotificationType = "lobby_created";
 
@@ -26,6 +27,7 @@ class NotificationService {
   private notificationPermission: NotificationPermission = "default";
   private audioContext: AudioContext | null = null;
   private notificationSound: HTMLAudioElement | null = null;
+  private cachedSettings: NotificationSettings | null = null;
 
   /**
    * Запрашивает разрешение на системные уведомления
@@ -55,6 +57,43 @@ class NotificationService {
   }
 
   /**
+   * Получает громкость из настроек (преобразует 1-10 в 0.1-1.0)
+   */
+  private getVolumeFromSettings(): number {
+    // Если настройки закэшированы, используем их
+    if (this.cachedSettings) {
+      // Преобразуем 1-10 в 0.1-1.0
+      return this.cachedSettings.notificationsVolume / 10;
+    }
+    // Значение по умолчанию (5 -> 0.5)
+    return 0.5;
+  }
+
+  /**
+   * Получает настройки уведомлений через API
+   */
+  private async fetchNotificationSettings(): Promise<NotificationSettings | null> {
+    try {
+      const settings = await getNotificationSettings();
+      this.cachedSettings = settings;
+      return settings;
+    } catch (error) {
+      console.warn("Failed to fetch notification settings:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Обновляет громкость звука на основе текущих настроек
+   */
+  private updateSoundVolume(): void {
+    const volume = this.getVolumeFromSettings();
+    if (this.notificationSound) {
+      this.notificationSound.volume = volume;
+    }
+  }
+
+  /**
    * Инициализирует звук уведомления (звук найденной игры из Dota 2)
    * Поддерживает форматы: mp3, ogg, wav
    * Файл должен быть размещен в public/dota2-match-found.{format}
@@ -71,7 +110,7 @@ class NotificationService {
 
       for (const format of soundFormats) {
         const audio = new Audio(`/dota2-match-found.${format}`);
-        audio.volume = 0.3; // Устанавливаем громкость
+        audio.volume = this.getVolumeFromSettings(); // Устанавливаем громкость из настроек
         audio.preload = "auto";
 
         // Проверяем, может ли браузер воспроизвести этот формат
@@ -112,9 +151,17 @@ class NotificationService {
   /**
    * Воспроизводит звук уведомления
    */
-  private playNotificationSound(): void {
+  private async playNotificationSound(): Promise<void> {
+    // Обновляем настройки перед воспроизведением, если они не загружены
+    if (!this.cachedSettings) {
+      await this.fetchNotificationSettings();
+    }
+
     // Инициализируем звук при первом использовании
     this.initNotificationSound();
+
+    // Обновляем громкость перед воспроизведением
+    this.updateSoundVolume();
 
     try {
       // Пытаемся воспроизвести звук из файла
@@ -157,7 +204,9 @@ class NotificationService {
       oscillator.frequency.value = 800; // Частота в Гц
       oscillator.type = "sine";
 
-      gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+      // Используем громкость из настроек
+      const volume = this.getVolumeFromSettings();
+      gainNode.gain.setValueAtTime(volume, this.audioContext.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(
         0.01,
         this.audioContext.currentTime + 0.2
@@ -209,14 +258,51 @@ class NotificationService {
   }
 
   /**
+   * Проверяет и обновляет токен, если он истек
+   * Использует axios interceptor для автоматического обновления токена
+   * @returns true если токен был обновлен или был актуален, false если не удалось обновить
+   */
+  private async refreshTokenIfNeeded(): Promise<boolean> {
+    const token = appSessionStore.getSessionToken();
+    if (!token) {
+      console.warn("No token available for refresh");
+      return false;
+    }
+
+    // Проверяем, истек ли токен
+    if (appSessionStore.isSessionExpired()) {
+      console.log("Token expired, refreshing via axios interceptor...");
+      try {
+        // Выполняем запрос через authorizedApiClient
+        // Interceptor автоматически обновит токен, если он истек
+        // Используем любой endpoint, который требует авторизации
+        await authorizedApiClient.get("/notifications/stream", {
+          validateStatus: () => true, // Не выбрасываем ошибку, чтобы обработать через interceptor
+        });
+        console.log("Token refreshed successfully");
+        return true;
+      } catch (error) {
+        console.error("Failed to refresh token:", error);
+        return false;
+      }
+    }
+
+    // Токен актуален
+    return true;
+  }
+
+  /**
    * Подключается к SSE эндпоинту для получения уведомлений
    */
-  connect(): void {
+  async connect(): Promise<void> {
     const token = appSessionStore.getSessionToken();
     if (!token) {
       console.warn("Cannot connect to notifications: no token");
       return;
     }
+
+    // Загружаем настройки при подключении
+    await this.fetchNotificationSettings();
 
     // Запрашиваем разрешение на уведомления при первом подключении
     if (this.notificationPermission === "default") {
@@ -243,10 +329,10 @@ class NotificationService {
         this.startHeartbeat();
       };
 
-      this.eventSource.onmessage = (event) => {
+      this.eventSource.onmessage = async (event) => {
         try {
           const payload: NotificationPayload = JSON.parse(event.data);
-          this.handleNotification(payload);
+          await this.handleNotification(payload);
         } catch (error) {
           console.error("Failed to parse notification:", error);
         }
@@ -257,13 +343,18 @@ class NotificationService {
         // Heartbeat обрабатывается автоматически
       });
 
-      this.eventSource.onerror = (error) => {
+      this.eventSource.onerror = async (error) => {
         console.error("SSE connection error:", error);
         this.isConnected = false;
         this.stopHeartbeat();
 
         // Проверяем состояние соединения
         if (this.eventSource?.readyState === EventSource.CLOSED) {
+          // Проверяем и обновляем токен, если он истек
+          const tokenRefreshed = await this.refreshTokenIfNeeded();
+          if (tokenRefreshed) {
+            console.log("Token refreshed, reconnecting...");
+          }
           this.handleReconnect();
         }
       };
@@ -293,10 +384,12 @@ class NotificationService {
   /**
    * Обрабатывает полученное уведомление
    */
-  private handleNotification(payload: NotificationPayload): void {
+  private async handleNotification(
+    payload: NotificationPayload
+  ): Promise<void> {
     switch (payload.type) {
       case "lobby_created":
-        this.showLobbyCreatedNotification(payload);
+        await this.showLobbyCreatedNotification(payload);
         break;
       default:
         console.warn("Unknown notification type:", payload.type);
@@ -306,7 +399,9 @@ class NotificationService {
   /**
    * Показывает уведомление о создании лобби
    */
-  private showLobbyCreatedNotification(payload: NotificationPayload): void {
+  private async showLobbyCreatedNotification(
+    payload: NotificationPayload
+  ): Promise<void> {
     const { data } = payload;
     const title = "🎮 Игра скоро начнется!";
     const message =
@@ -319,7 +414,7 @@ class NotificationService {
     };
 
     // Воспроизводим звук
-    this.playNotificationSound();
+    await this.playNotificationSound();
 
     // Показываем уведомление Mantine (в приложении)
     notifications.show({
@@ -346,11 +441,13 @@ class NotificationService {
     this.reconnectAttempts++;
     const delay = this.reconnectDelay * this.reconnectAttempts;
 
-    this.reconnectTimeout = window.setTimeout(() => {
+    this.reconnectTimeout = window.setTimeout(async () => {
       console.log(
         `Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`
       );
-      this.connect();
+      // Проактивно обновляем токен перед переподключением
+      await this.refreshTokenIfNeeded();
+      await this.connect();
     }, delay);
   }
 
@@ -373,6 +470,16 @@ class NotificationService {
   }
 
   /**
+   * Обновляет кэш настроек уведомлений
+   * Вызывается после обновления настроек через форму
+   */
+  updateSettingsCache(settings: NotificationSettings): void {
+    this.cachedSettings = settings;
+    // Обновляем громкость звука, если он уже инициализирован
+    this.updateSoundVolume();
+  }
+
+  /**
    * Проверяет, подключен ли сервис
    */
   get connected(): boolean {
@@ -383,3 +490,39 @@ class NotificationService {
 }
 
 export const notificationService = new NotificationService();
+
+// Типы для настроек уведомлений
+export interface NotificationSettings {
+  id: number;
+  userId: number;
+  isTelegramNotifications: boolean;
+  isSSENotifications: boolean;
+  notificationsVolume: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateNotificationSettingsRequest {
+  isTelegramNotifications?: boolean;
+  isSSENotifications?: boolean;
+  notificationsVolume?: number;
+}
+
+// API методы для настроек уведомлений
+export const getNotificationSettings =
+  async (): Promise<NotificationSettings> => {
+    const response = await authorizedApiClient.get<NotificationSettings>(
+      "/users/profile/notifications"
+    );
+    return response.data;
+  };
+
+export const updateNotificationSettings = async (
+  data: UpdateNotificationSettingsRequest
+): Promise<NotificationSettings> => {
+  const response = await authorizedApiClient.patch<NotificationSettings>(
+    "/users/profile/notifications",
+    data
+  );
+  return response.data;
+};

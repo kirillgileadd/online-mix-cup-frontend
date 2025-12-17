@@ -2,7 +2,10 @@ import clsx from "clsx";
 import type { FC } from "react";
 import { Container, Title } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { ProfileForm } from "../features/ManageProfile";
+import {
+  ProfileForm,
+  NotificationSettingsForm,
+} from "../features/ManageProfile";
 import { useUpdateProfile, useGetProfile } from "../features/ManageProfile";
 import { getChangedFields } from "../features/ManageProfile/model/getChangedFields";
 import type { ProfileFormValues } from "../features/ManageProfile/model/types";
@@ -92,14 +95,17 @@ export const ProfilePage: FC<ProfilePageProps> = ({ className }) => {
 
   return (
     <Container size="xl" className={clsx("py-6", className)}>
-      <div className="max-w-md">
-        <Title order={2} mb="md">
-          Мой профиль
-        </Title>
-        <ProfileForm
-          isPending={updateMutation.isPending}
-          onSuccess={onUpdateProfile}
-        />
+      <Title order={2} mb="md">
+        Мой профиль
+      </Title>
+      <div className="flex gap-6">
+        <div className="max-w-md space-y-6">
+          <ProfileForm
+            isPending={updateMutation.isPending}
+            onSuccess={onUpdateProfile}
+          />
+        </div>
+        <NotificationSettingsForm />
       </div>
     </Container>
   );

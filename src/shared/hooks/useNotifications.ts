@@ -14,7 +14,9 @@ export function useNotifications() {
 
     // Подключаемся только если пользователь авторизован
     if (session && !isConnectedRef.current) {
-      notificationService.connect();
+      notificationService.connect().catch((error) => {
+        console.error("Failed to connect to notifications:", error);
+      });
       isConnectedRef.current = true;
     }
 
@@ -33,7 +35,9 @@ export function useNotifications() {
       if (event.type === "update") {
         // Пользователь авторизовался - подключаемся
         if (!isConnectedRef.current) {
-          notificationService.connect();
+          notificationService.connect().catch((error) => {
+            console.error("Failed to connect to notifications:", error);
+          });
           isConnectedRef.current = true;
         }
       } else if (event.type === "remove") {
@@ -51,7 +55,9 @@ export function useNotifications() {
   return {
     connected: notificationService.connected,
     connect: () => {
-      notificationService.connect();
+      notificationService.connect().catch((error) => {
+        console.error("Failed to connect to notifications:", error);
+      });
       isConnectedRef.current = true;
     },
     disconnect: () => {

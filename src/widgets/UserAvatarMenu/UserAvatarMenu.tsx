@@ -2,8 +2,11 @@ import { Avatar, Menu, Text } from "@mantine/core";
 import {
   IconUser,
   IconLogout,
-  IconSettings,
   IconUserCircle,
+  IconUsers,
+  IconTrophy,
+  IconFileText,
+  IconPlayerPlay,
 } from "@tabler/icons-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTransition } from "react";
@@ -70,12 +73,34 @@ export function UserAvatarMenu({ session, className }: UserAvatarMenuProps) {
           Мой профиль
         </Menu.Item>
         <AppCan action={(permissions) => permissions.users.canManage()}>
+          <Menu.Label>Админка</Menu.Label>
           <Menu.Item
             component={Link}
             to={ROUTES.adminUsers}
-            leftSection={<IconSettings size={16} />}
+            leftSection={<IconUsers size={16} />}
           >
-            Админка
+            Пользаки
+          </Menu.Item>
+          <Menu.Item
+            component={Link}
+            to={ROUTES.adminTournaments}
+            leftSection={<IconTrophy size={16} />}
+          >
+            Турниры
+          </Menu.Item>
+          <Menu.Item
+            component={Link}
+            to={ROUTES.adminApplications}
+            leftSection={<IconFileText size={16} />}
+          >
+            Заявки
+          </Menu.Item>
+          <Menu.Item
+            component={Link}
+            to={ROUTES.adminPlayers}
+            leftSection={<IconPlayerPlay size={16} />}
+          >
+            Игроки
           </Menu.Item>
         </AppCan>
         <Menu.Divider />
