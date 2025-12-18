@@ -10,6 +10,7 @@ import {
   Container,
   Title,
   Button,
+  ActionIcon,
   Modal,
   Text,
   Stack,
@@ -35,15 +36,29 @@ export const LeaderboardPage: FC<LeaderboardPageProps> = ({ className }) => {
 
   return (
     <Container size="md" className={clsx("py-6", className)}>
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <Title size="h1">Лидерборд</Title>
-        <Button
-          leftSection={<IconInfoCircle size={18} />}
-          variant="light"
-          onClick={() => setOpened(true)}
-        >
-          Как начисляются очки
-        </Button>
+      <div className="mb-6">
+        <div className="flex items-center justify-between gap-4">
+          <Title size="h1">Лидерборд</Title>
+          <div className="hidden md:block">
+            <Button
+              leftSection={<IconInfoCircle size={18} />}
+              variant="light"
+              onClick={() => setOpened(true)}
+            >
+              Как начисляются очки
+            </Button>
+          </div>
+          <div className="md:hidden">
+            <ActionIcon
+              variant="light"
+              size="lg"
+              onClick={() => setOpened(true)}
+              aria-label="Как начисляются очки"
+            >
+              <IconInfoCircle size={18} />
+            </ActionIcon>
+          </div>
+        </div>
       </div>
       <TopPlayersSection topPlayers={topPlayers} />
       <LeaderboardTable />

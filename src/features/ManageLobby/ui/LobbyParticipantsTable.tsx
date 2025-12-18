@@ -82,14 +82,7 @@ export const LobbyParticipantsTable: FC<LobbyParticipantsTableProps> = ({
         size: 80,
         Cell: ({ row }) => <>{row.original.player?.mmr ?? "-"}</>,
       },
-      {
-        accessorKey: "player.lives",
-        header: "Жизни",
-        sortingFn: numericSortingFn,
-        filterFn: "equals",
-        size: 80,
-        Cell: ({ row }) => <>{row.original.player?.lives ?? "-"}</>,
-      },
+
       {
         accessorKey: "player.gameRoles",
         header: "Роли",
@@ -97,6 +90,14 @@ export const LobbyParticipantsTable: FC<LobbyParticipantsTableProps> = ({
         filterFn: "contains",
         size: 120,
         Cell: ({ row }) => <>{row.original.player?.gameRoles ?? "-"}</>,
+      },
+      {
+        accessorKey: "player.lives",
+        header: "Жизни",
+        sortingFn: numericSortingFn,
+        filterFn: "equals",
+        size: 80,
+        Cell: ({ row }) => <>{row.original.player?.lives ?? "-"}</>,
       },
       {
         id: "team",

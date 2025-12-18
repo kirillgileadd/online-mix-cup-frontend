@@ -186,7 +186,7 @@ export const AboutTournamentPage: FC<AboutTournamentPageProps> = ({
           <div className="max-w-4xl mx-auto">
             <Title
               order={2}
-              className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black! mb-6 md:mb-8! italic uppercase tracking-tight text-center"
+              className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black! mb-6! md:mb-8! italic uppercase tracking-tight text-center"
             >
               Часто задаваемые вопросы
             </Title>
