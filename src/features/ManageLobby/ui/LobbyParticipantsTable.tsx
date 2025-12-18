@@ -125,10 +125,7 @@ export const LobbyParticipantsTable: FC<LobbyParticipantsTableProps> = ({
                 {getTeamLabel(team || null, captain)}
               </Badge>
               {row.original.isCaptain && (
-                <IconShieldCheck
-                  size={16}
-                  color="var(--mantine-color-yellow-6)"
-                />
+                <IconShieldCheck size={16} color="white" />
               )}
             </Group>
           );
@@ -186,7 +183,19 @@ export const LobbyParticipantsTable: FC<LobbyParticipantsTableProps> = ({
       size: 90,
     },
     mantinePaperProps: {
-      className: "bg-dark-6!",
+      className: "bg-[var(--color-dark-600)]",
+    },
+    mantineTableProps: {
+      className: "bg-[var(--color-dark-600)]",
+    },
+    mantineTableBodyRowProps: () => ({
+      className: "bg-[var(--color-dark-600)]",
+    }),
+    mantineTableHeadCellProps: {
+      className: "bg-[var(--color-dark-600)]!",
+    },
+    mantineTableBodyCellProps: {
+      className: "bg-[var(--color-dark-600)]",
     },
     enableColumnFilters: false,
     enableTopToolbar: false,

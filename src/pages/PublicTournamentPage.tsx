@@ -61,13 +61,14 @@ export const PublicTournamentPage: FC<PublicTournamentPageProps> = ({
     useState<TournamentTabValue>("applications");
   const [viewMode, setViewMode] = useState<"lobbies" | "rounds">("lobbies");
   const isDesktop = useMediaQuery("(min-width: 64rem)");
-
+  const isMobile = useMediaQuery("(max-width: 64rem)");
+  console.log(viewMode, isMobile, "viewMode isMobile");
   // На мобильных принудительно используем режим "по раундам"
   useEffect(() => {
-    if (!isDesktop) {
+    if (isMobile) {
       setViewMode("rounds");
     }
-  }, [isDesktop]);
+  }, [isMobile]);
 
   // Сортируем лобби: сначала по раунду, потом по ID
   // Важно: этот хук должен быть вызван до любых условных возвратов

@@ -9,10 +9,9 @@ import {
   Select,
   Text,
   ActionIcon,
-  Tooltip,
   Menu,
 } from "@mantine/core";
-import { IconReplace, IconShieldCheck, IconDots } from "@tabler/icons-react";
+import { IconDots } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
 import type { Lobby, Participation, Team } from "../../../shared/api/lobbies";
 import {
@@ -26,6 +25,7 @@ import {
 import { isTeamFull } from "../model/teamUtils";
 import { notifications } from "@mantine/notifications";
 import { TeamDraftForm } from "./TeamDraftForm";
+import { LobbyParticipantsTable } from "./LobbyParticipantsTable";
 
 type LobbyCardProps = {
   lobby: Lobby;
@@ -361,7 +361,11 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
               {getStatusLabel(lobby.status)}
             </Badge>
             {winningTeam && (
-              <Badge color="green" size="lg" variant="light">
+              <Badge
+                color={winningTeam.id === team1?.id ? "red" : "blue"}
+                size="lg"
+                variant="light"
+              >
                 🏆 Победитель:{" "}
                 {getTeamLabel(
                   winningTeam,
@@ -563,63 +567,24 @@ export const LobbyCard: FC<LobbyCardProps> = ({ lobby, readonly }) => {
           </div>
 
           {/* Список всех игроков */}
-          <div className="md:basis-1/2 md:flex-1 min-w-0">
-            <Group justify="space-between" mb="xs">
+          <div className="md:basis-[57%] md:flex-1 min-w-0">
+            <Group className="mb-3" justify="space-between">
               <Title order={5}>Игроки лобби</Title>
               <Badge variant="light" color="gray">
                 {lobby.participations.length}
               </Badge>
             </Group>
-            {lobby.participations.map((participant) => (
-              <div
-                key={participant.id}
-                className="flex flex-wrap items-center justify-between text-sm py-2"
-              >
-                <div className="flex items-center gap-2">
-                  <Text fw={600}>{getPlayerName(participant)}</Text>
-                  <div className="flex gap-4 text-gray-400">
-                    <span>MMR: {participant.player?.mmr ?? "-"}</span>
-                    <span>Жизни: {participant.player?.lives ?? "-"}</span>
-                    <span>Роли: {participant.player?.gameRoles ?? "-"}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="flex gap-2 text-xs">
-                    {participant.isCaptain && <IconShieldCheck size={16} />}
-                    {participant.teamId && (
-                      <Badge
-                        size="xs"
-                        variant="light"
-                        color={
-                          participant.teamId === team1?.id ? "red" : "blue"
-                        }
-                      >
-                        {getTeamLabel(
-                          teams.find((t) => t.id === participant.teamId) ||
-                            null,
-                          participant.teamId === team1?.id ? captain1 : captain2
-                        )}
-                      </Badge>
-                    )}
-                  </div>
-                  {!readonly && (
-                    <Tooltip label="Заменить игрока">
-                      <ActionIcon
-                        variant="subtle"
-                        color="orange"
-                        size="sm"
-                        onClick={() =>
-                          handleReplacePlayer(participant.playerId)
-                        }
-                        loading={replacePlayerMutation.isPending}
-                      >
-                        <IconReplace size={16} />
-                      </ActionIcon>
-                    </Tooltip>
-                  )}
-                </div>
-              </div>
-            ))}
+            <LobbyParticipantsTable
+              participations={lobby.participations}
+              teams={teams}
+              team1={team1}
+              team2={team2}
+              captain1={captain1 ?? null}
+              captain2={captain2 ?? null}
+              readonly={readonly}
+              onReplacePlayer={!readonly ? handleReplacePlayer : undefined}
+              isReplacing={replacePlayerMutation.isPending}
+            />
           </div>
         </div>
       </Stack>
