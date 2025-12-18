@@ -58,16 +58,19 @@ export const AboutTournamentPage: FC<AboutTournamentPageProps> = ({
             >
               ТУРНИР ПО DOTA 2
               <br />
-              для потных раков
+              без комиссии
             </Title>
 
             {/* Подзаголовок */}
             <div className="space-y-2 md:space-y-3 max-w-3xl mt-2 sm:mt-3 md:mt-4 px-2">
               <Text className="text-gray-500! text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-light leading-relaxed">
-                Микс Турнир для игры соло или с друзьями.
+                Микс Турнир 5 на 5 для игры соло или с друзьями.
               </Text>
               <Text className="text-gray-500! text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-light leading-relaxed">
                 Система жизней, Автоподбор команды.
+              </Text>
+              <Text className="text-gray-500! text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-light leading-relaxed">
+                Турнир без комиссии — все взносы формируют призовой фонд.
               </Text>
             </div>
 
@@ -107,14 +110,15 @@ export const AboutTournamentPage: FC<AboutTournamentPageProps> = ({
               </Title>
               <div className="space-y-4">
                 <Text className="text-white text-sm sm:text-base md:text-lg leading-relaxed">
-                  Турнир с автоматическим подбором команд — играй соло или с
-                  друзьями, система сама сформирует сбалансированные составы для
-                  каждого матча.
+                  Турнир 5 на 5 с автоматическим подбором команд — играй соло
+                  или с друзьями, система сама сформирует сбалансированные
+                  составы для каждого матча.
                 </Text>
                 <Text className="text-white text-sm sm:text-base md:text-lg leading-relaxed">
-                  Взносы участников формируют призовой фонд. После каждой игры
-                  проигравшие теряют жизнь. Победитель с наибольшим количеством
-                  жизней забирает весь призовой фонд.
+                  Турнир проходит без комиссии — все взносы участников полностью
+                  формируют призовой фонд. После каждой игры проигравшие теряют
+                  жизнь. Победитель с наибольшим количеством жизней забирает
+                  весь призовой фонд.
                 </Text>
               </div>
             </div>

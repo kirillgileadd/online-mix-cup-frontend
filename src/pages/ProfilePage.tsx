@@ -98,14 +98,14 @@ export const ProfilePage: FC<ProfilePageProps> = ({ className }) => {
       <Title order={2} mb="md">
         Мой профиль
       </Title>
-      <div className="flex gap-6">
-        <div className="max-w-md space-y-6">
+      <div className="flex flex-wrap md:flex-row flex-col gap-6">
+        <div className="space-y-6 basis-1/3">
           <ProfileForm
             isPending={updateMutation.isPending}
             onSuccess={onUpdateProfile}
           />
         </div>
-        <NotificationSettingsForm />
+        <NotificationSettingsForm className="basis-1/3" />
       </div>
     </Container>
   );
