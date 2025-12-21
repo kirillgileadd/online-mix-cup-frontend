@@ -91,7 +91,7 @@ export const AboutTournamentPage: FC<AboutTournamentPageProps> = ({
               <img
                 src="/land-bg-2-1.png"
                 alt=""
-                className="w-full max-w-[800px] h-auto object-cover opacity-90 aspect-video min-h-[300px]"
+                className="w-full max-w-[800px] h-auto object-cover opacity-90 min-h-[300px]"
                 loading="eager"
                 fetchPriority="high"
               />
