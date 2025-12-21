@@ -31,6 +31,8 @@ export const AboutTournamentPage: FC<AboutTournamentPageProps> = ({
             src="/dragonstouch_loading_screen.png"
             alt=""
             className="w-full h-full object-cover opacity-30"
+            loading="eager"
+            fetchPriority="high"
           />
         </picture>
         {/* Градиент от темно-синего/бирюзового внизу к черному вверху */}
@@ -89,7 +91,9 @@ export const AboutTournamentPage: FC<AboutTournamentPageProps> = ({
               <img
                 src="/land-bg-2-1.png"
                 alt=""
-                className="w-full max-w-[800px] h-auto object-cover opacity-90"
+                className="w-full max-w-[800px] h-auto object-cover opacity-90 aspect-video min-h-[300px]"
+                loading="eager"
+                fetchPriority="high"
               />
             </picture>
           </div>
