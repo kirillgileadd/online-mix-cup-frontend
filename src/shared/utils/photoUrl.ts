@@ -15,7 +15,7 @@ export function getPhotoUrl(photoUrl: string | null | undefined): string | undef
   }
 
   // Если начинается с /uploads или другой относительный путь - добавляем базовый URL API
-  const baseUrl = import.meta.env.VITE_ENVOY_API_URL || "";
+  const baseUrl = import.meta.env.VITE_STATIC || "";
   return `${baseUrl}${photoUrl}`;
 }
 

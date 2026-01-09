@@ -194,7 +194,7 @@ export const ApplicationsTable: FC<ApplicationsTableProps> = ({
         Cell: ({ cell }) => {
           const value = cell.getValue() as string | null | undefined;
           if (!value) return <>-</>;
-          const imageUrl = `${import.meta.env.VITE_ENVOY_API_URL}${value}`;
+          const imageUrl = `${import.meta.env.VITE_STATIC}${value}`;
           return (
             <Image
               src={imageUrl}

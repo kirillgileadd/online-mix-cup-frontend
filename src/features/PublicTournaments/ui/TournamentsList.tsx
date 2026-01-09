@@ -174,7 +174,7 @@ export const TournamentsList: FC<TournamentsListProps> = ({ className }) => {
                 {tournament?.previewUrl && (
                   <div className="aspect-square overflow-hidden rounded-md">
                     <Image
-                      src={`${import.meta.env.VITE_ENVOY_API_URL}${tournament.previewUrl}`}
+                      src={`${import.meta.env.VITE_STATIC}${tournament.previewUrl}`}
                       alt={tournament.name}
                       fit="cover"
                       className="w-full h-full object-cover"

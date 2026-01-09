@@ -83,7 +83,7 @@ export const ProfileForm: FC<ProfileFormProps> = ({
 
       // Если начинается с /uploads - добавляем базовый URL API
       if (profilePhoto.startsWith("/uploads")) {
-        const baseUrl = import.meta.env.VITE_ENVOY_API_URL || "";
+        const baseUrl = import.meta.env.VITE_STATIC || "";
         return `${baseUrl}${profilePhoto}`;
       }
 

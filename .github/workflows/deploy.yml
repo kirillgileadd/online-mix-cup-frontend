@@ -20,8 +20,9 @@ jobs:
         run: |
           docker build \
             --build-arg VITE_ENVOY_API_URL=${{ secrets.VITE_ENVOY_API_URL }} \
-            --build-arg VITE_NODE_ENV=${{ secrets.VITE_NODE_ENV }} \
             --build-arg VITE_TELEGRAM_BOT_USERNAME=${{ secrets.VITE_TELEGRAM_BOT_USERNAME }} \
+            --build-arg VITE_NODE_ENV=${{ secrets.VITE_NODE_ENV }} \
+            --build-arg VITE_STATIC=${{ secrets.VITE_STATIC }} \
             -t ${{ secrets.DOCKER_USERNAME }}/mixify_fe:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/mixify_fe:latest
 
